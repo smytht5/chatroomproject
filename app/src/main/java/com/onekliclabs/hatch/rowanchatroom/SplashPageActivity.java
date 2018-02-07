@@ -20,13 +20,12 @@ public class SplashPageActivity extends Activity
 
         new Handler().postDelayed(new Runnable(){
             @Override
-            public void run() {
+            public void run()
+            {
                 /* Create an Intent that will start the Menu-Activity. */
                 startActivity(new Intent(getBaseContext(), MainActivity.class));
                 SplashPageActivity.this.finish();
             }
         }, 3000);
-
-
     }
 }
