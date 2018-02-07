@@ -129,7 +129,7 @@ public class MainActivity extends Activity implements View.OnClickListener
 
         //Throw exception if file doesn't exist
         if (!profile.exists())
-            throw new FileNotFoundException("File Does Not Exist");
+            throw new FileNotFoundException("File Does't Exist");
 
         BufferedReader profileReader;
 
