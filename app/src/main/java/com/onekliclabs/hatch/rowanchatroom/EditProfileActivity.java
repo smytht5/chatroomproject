@@ -116,8 +116,9 @@ public class EditProfileActivity extends Activity implements GetPictureFragment.
 
     public void initWidgets()
     {
-        imageButton = (ImageButton) findViewById(R.id.imgbutn_editimage);
-        userNameEditText = (EditText) findViewById(R.id.ep_editText_username);
+        imageButton =  findViewById(R.id.imgbutn_editimage);
+        userNameEditText = findViewById(R.id.ep_editText_username);
+        
     }
 
 
