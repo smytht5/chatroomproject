@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,7 +46,7 @@ public class MainActivity extends Activity implements View.OnClickListener
     private Button send;
     private RadioButton rbutton;
 
-    //private Client mClient;
+    private Client mClient;
 
     public static String userName;
     public static Uri pictureUri;
@@ -65,17 +68,17 @@ public class MainActivity extends Activity implements View.OnClickListener
 
         //initialize widgets an
         initWidgets();
+        mClient.connect("Main Activity");
 
-        // connect to the server
-        //new AsyncTask().execute("");
-
-        //new Handler().postDelayed(new Runnable() {
-        //    @Override
-         //   public void run() {
-        //        /* Create an Intent that will start the Menu-Activity. */
-        //        mClient.sendMessage(userName);
-        //    }
-        //}, 100);
+        new Handler().postDelayed(new Runnable()
+        {
+           @Override
+           public void run()
+           {
+                /* Create an Intent that will start the Menu-Activity. */
+                mClient.sendMessage(userName);
+            }
+        }, 100);
 
 
 
@@ -223,81 +226,7 @@ public class MainActivity extends Activity implements View.OnClickListener
     }
 
 
-    /**
-     * ASychronise task that operates in the background waiting to
-     * recieve a message from the server. Once a message is a recived it
-     * updates the chat list with the new message.
-     *
-    private class AsyncTask extends android.os.AsyncTask<String,String, Client>
-    {
-         protected Client doInBackground(String... message)
-         {
 
-             //create a Client object
-             mClient = new Client(new Client.OnMessageReceived()
-
-             {
-                @Override
-                //here the messageReceived method is implemented
-                public void onMessageReceived(String message) {
-                    //this method calls the onProgressUpdate
-                    publishProgress(message);
-                }
-
-                @Override
-                public void onErrorMessageReceived()
-                {
-                    publishProgress("Server Error");
-                }
-             });
-
-             mClient.run();
-
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values)
-        {
-            super.onProgressUpdate(values);
-
-
-            if(values[0].equals("Server Error"))
-                postErrorMessage();
-            else
-                interpretMessage(values[0]);
-
-        }
-    }
-
-    private void postErrorMessage()
-    {
-        Toast.makeText(getApplicationContext(),"Couldn't connect to server",Toast.LENGTH_LONG).show();
-    }
-
-    private void interpretMessage(String value)
-    {
-        if (value.contains(ADD_LIKE))
-        {
-            String subString = value.replace(ADD_LIKE,"");
-            int position = Integer.parseInt(subString);
-            ChatBox chb = adp.getItem(position);
-            chb.addLike();
-            adp.notifyDataSetChanged();
-
-        }else if(value.contains(REMOVE_LIKE))
-        {
-            String subString = value.replace(REMOVE_LIKE,"");
-            int position = Integer.parseInt(subString);
-            ChatBox chb = adp.getItem(position);
-            chb.removeLike();
-            adp.notifyDataSetChanged();
-
-        }else
-        {
-            adp.add(new ChatBox(value));
-        }
-    }**/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
