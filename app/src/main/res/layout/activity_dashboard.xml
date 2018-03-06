@@ -32,12 +32,23 @@
             android:layout_height="wrap_content"
             android:text="Shamrock Talk"
             android:padding="10dp"/>
-
-        <ImageButton
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/shamrock"
-            android:padding="10dp" />
+            android:gravity="center_horizontal"
+            android:background="@color/colorWhite"
+            android:padding="10dp">
+
+            <ImageButton
+                android:id="@+id/imgbtn_Shamrock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shamrock"
+                android:padding="10dp" />
+
+        </LinearLayout>
+
+
 
         <LinearLayout
             android:layout_width="match_parent"

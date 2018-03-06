@@ -12,7 +12,8 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.IBinder;
 
-public class MyService extends Service {
+public class MyService extends Service
+{
     private static final String DOMAIN = "xmpp.jp";
     private static final String USERNAME = "admin";
     private static final String PASSWORD = "admin";

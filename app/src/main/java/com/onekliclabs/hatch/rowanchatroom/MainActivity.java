@@ -46,8 +46,6 @@ public class MainActivity extends Activity implements View.OnClickListener
     private Button send;
     private RadioButton rbutton;
 
-    private Client mClient;
-
     public static String userName;
     public static Uri pictureUri;
 
@@ -68,19 +66,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 
         //initialize widgets an
         initWidgets();
-        mClient.connect("Main Activity");
 
-        new Handler().postDelayed(new Runnable()
-        {
-           @Override
-           public void run()
-           {
-                /* Create an Intent that will start the Menu-Activity. */
-                mClient.sendMessage(userName);
-            }
-        }, 100);
-
-
+        startService(new Intent(getBaseContext(), MyService.class));
 
         // listener if user presses send
         send.setOnClickListener(this);

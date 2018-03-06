@@ -7,7 +7,8 @@ package com.onekliclabs.hatch.rowanchatroom;
 import java.lang.ref.WeakReference;
 import android.os.Binder;
 
-public class LocalBinder<S> extends Binder {
+public class LocalBinder<S> extends Binder
+{
     private final WeakReference<S> mService;
 
     public LocalBinder(final S service) {

@@ -23,7 +23,7 @@ public class SplashPageActivity extends Activity
             public void run()
             {
                 /* Create an Intent that will start the Menu-Activity. */
-                startActivity(new Intent(getBaseContext(), MainActivity.class));
+                startActivity(new Intent(getBaseContext(), LoginActivity.class));
                 SplashPageActivity.this.finish();
             }
         }, 3000);

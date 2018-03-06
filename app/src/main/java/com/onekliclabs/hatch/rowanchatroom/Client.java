@@ -48,7 +48,8 @@ public class Client {
     public static boolean instanceCreated = false;
 
     public Client(MyService context, String serverAdress, String logiUser,
-                  String passwordser) {
+                  String passwordser)
+    {
         this.serverAddress = serverAdress;
         this.loginUser = logiUser;
         this.passwordUser = passwordser;
@@ -75,7 +76,9 @@ public class Client {
 
     String text = "";
     String mMessage = "", mReceiver = "";
-    static {
+
+    static
+    {
         try {
             Class.forName("org.jivesoftware.smack.ReconnectionManager");
         } catch (ClassNotFoundException ex) {
@@ -83,7 +86,8 @@ public class Client {
         }
     }
 
-    public void init() {
+    public void init()
+    {
         gson = new Gson();
         mMessageListener = new MMessageListener(context);
         mChatManagerListener = new ChatManagerListenerImpl();
@@ -91,7 +95,8 @@ public class Client {
 
     }
 
-    private void initialiseConnection() {
+    private void initialiseConnection()
+    {
 
         XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
                 .builder();
