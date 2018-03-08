@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private static final String FILE_REGISTER = "register";
 
-    //Protocr
+    //Protocal
     static final String ADD_LIKE = "/*";
     static final String REMOVE_LIKE = "/**";
 
@@ -60,44 +60,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //load profile info from file
-       // try
-       // {
-       //     loadProfileInfo();
-       // } catch (FileNotFoundException e)
-       // {
-       //     startActivity(new Intent(this, LoginActivity.class));
-       // }
-
-        //initialize widgets an
-        initWidgets();
-
         startService(new Intent(getBaseContext(), MyService.class));
 
-        // listener if user presses send
+        //initialize widgets and back button
+        initWidgets();
+
+        //listener if user presses send
         send.setOnClickListener(this);
 
         //keep scrolled to the bottom
         list.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         list.setAdapter(adp);
-
-
-        System.out.println("here 1");
+        /*
         adp.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
                 super.onChanged();
                 list.setSelection(adp.getCount() - 1);
             }
-        });
+        });*/
 
-        System.out.println("OnCreate entered: " + enters++);
-
-    }
-
-    @Override
-    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
-        return super.onCreateView(parent, name, context, attrs);
     }
 
     /**
@@ -121,36 +103,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
-    /**
-     * Loads information from file
-     * @throws FileNotFoundException
-     */
-    public void loadProfileInfo() throws FileNotFoundException
-    {
-        File profile = new File(getFilesDir(), FILE_REGISTER);
-
-        //Throw exception if file doesn't exist
-        if (!profile.exists())
-            throw new FileNotFoundException("File Does't Exist");
-
-        BufferedReader profileReader;
-
-        try
-        {
-            profileReader = new BufferedReader(new FileReader(profile));
-
-            userName = profileReader.readLine();
-
-            profileReader.close();
-
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-
     /**
      * Initialize all widgets and classes
      */
@@ -163,7 +115,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         list.setDivider(null);
         list.setDividerHeight(0);
         adp = new ChatArrayAdapter(this, R.layout.bubble_layout, userName);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
     }
 
     @Override
@@ -184,8 +137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         adp.notifyDataSetChanged();
         chatText.setText("");
         hideSoftKeyboard();
-
-
     }
 
 
@@ -205,47 +156,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    protected void onRestart()
-    {
-        super.onRestart();
 
+    @Override
+    public void onBackPressed()
+    {
+        finish();
     }
 
     @Override
-    protected void onStop()
-    {
-        super.onStop();
-
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
     }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Only show items in the action bar relevant to this screen
-        // decide what to show in the action bar.
-        getMenuInflater().inflate(R.menu.main, menu);
-
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        startActivity(new Intent(this, EditProfileActivity.class));
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onPause()
-    {
-        super.onPause();
-
-    }
-
-
 }
 
 

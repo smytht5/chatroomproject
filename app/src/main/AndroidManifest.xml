@@ -64,8 +64,7 @@
         <activity
             android:name=".EditProfileActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:parentActivityName="com.onekliclabs.hatch.rowanchatroom.MainActivity" >
+            android:screenOrientation="portrait">
 
             <category android:name="android.intent.category.DEFAULT" />
 

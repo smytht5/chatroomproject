@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -48,6 +49,9 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editprofile);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
 
         imageButton =  (ImageButton) findViewById(R.id.imgbutn_editimage);
         userNameEditText = (EditText) findViewById(R.id.ep_editText_username);
@@ -285,4 +289,21 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
 
     }
 
+    @Override
+    public void onBackPressed()
+    {
+        //super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId())
+        {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
+    }
 }
