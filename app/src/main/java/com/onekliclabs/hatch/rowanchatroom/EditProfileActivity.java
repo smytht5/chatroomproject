@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.app.FragmentManager;
 import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -28,7 +29,7 @@ import java.util.Date;
 /**
  * Created by Owner on 7/17/15.
  */
-public class EditProfileActivity extends Activity implements GetPictureFragment.OnFragmentInteractionListener
+public class EditProfileActivity extends AppCompatActivity implements GetPictureFragment.OnFragmentInteractionListener
 {
 
     public static final int IMAGE_GALLERY_REQUEST = 20;
@@ -48,8 +49,8 @@ public class EditProfileActivity extends Activity implements GetPictureFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editprofile);
 
-        setActionBar();
-        initWidgets();
+        imageButton =  (ImageButton) findViewById(R.id.imgbutn_editimage);
+        userNameEditText = (EditText) findViewById(R.id.ep_editText_username);
 
         //if user has already chosen picture upload it to image button
         if (pictureUri != null)
@@ -114,22 +115,6 @@ public class EditProfileActivity extends Activity implements GetPictureFragment.
         });
     }
 
-    public void initWidgets()
-    {
-        imageButton =  findViewById(R.id.imgbutn_editimage);
-        userNameEditText = findViewById(R.id.ep_editText_username);
-        
-    }
-
-
-    /**
-     * Set Icon to back button
-     */
-    public void setActionBar()
-    {
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)

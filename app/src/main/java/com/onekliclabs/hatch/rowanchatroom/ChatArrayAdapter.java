@@ -43,6 +43,11 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
         this.uri = uri;
     }
 
+    public void saveState()
+    {
+
+    }
+
 
     @Override
     public void add(ChatBox chatBox)
@@ -69,7 +74,7 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
     }
 
     /**
-     * Method to set to indiviual list items to created bubble layout
+     * Method to set to individual list items to created bubble layout
      * @param position
      * @param convertView
      * @param parent

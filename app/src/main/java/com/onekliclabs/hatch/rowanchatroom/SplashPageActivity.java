@@ -16,7 +16,6 @@ public class SplashPageActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_page);
 
-        getActionBar().hide();
 
         new Handler().postDelayed(new Runnable(){
             @Override

@@ -9,5 +9,5 @@
         android:id="@+id/Profile"
         android:title="@string/profile"
         android:icon="@drawable/ic_action_action_settings"
-        android:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 </menu>

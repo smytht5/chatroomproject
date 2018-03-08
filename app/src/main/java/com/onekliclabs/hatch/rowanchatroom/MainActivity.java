@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Toast;
@@ -28,7 +31,7 @@ import java.io.IOException;
 /**
  * Created by Harold Hatch on 7/8/15.
  */
-public class MainActivity extends Activity implements View.OnClickListener
+public class MainActivity extends AppCompatActivity implements View.OnClickListener
 {
     /**
      *
@@ -48,6 +51,8 @@ public class MainActivity extends Activity implements View.OnClickListener
 
     public static String userName;
     public static Uri pictureUri;
+
+    int enters = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -86,11 +91,19 @@ public class MainActivity extends Activity implements View.OnClickListener
             }
         });
 
+        System.out.println("OnCreate entered: " + enters++);
+
+    }
+
+    @Override
+    public View onCreateView(View parent, String name, Context context, AttributeSet attrs) {
+        return super.onCreateView(parent, name, context, attrs);
     }
 
     /**
      * When user presses the radio button this method is called
      * @param view
+     **/
 
     public void onRadioButtonClicked(View view)
     {
@@ -99,13 +112,13 @@ public class MainActivity extends Activity implements View.OnClickListener
 
         if (checked)
         {
-            mClient.sendMessage(ADD_LIKE + (adp.getCount()));
+            //mClient.sendMessage(ADD_LIKE + (adp.getCount()));
         }
         else
         {
-            mClient.sendMessage(REMOVE_LIKE +(adp.getCount()));
+            //mClient.sendMessage(REMOVE_LIKE +(adp.getCount()));
         }
-    }*/
+    }
 
 
 
@@ -143,10 +156,10 @@ public class MainActivity extends Activity implements View.OnClickListener
      */
     public void initWidgets()
     {
-        chatText = findViewById(R.id.chat_editText);
-        rbutton =  findViewById(R.id.radioButton_like);
-        send =  findViewById(R.id.button_send);
-        list = findViewById(R.id.listView_1);
+        chatText = (EditText) findViewById(R.id.chat_editText);
+        rbutton =  (RadioButton) findViewById(R.id.radioButton_like);
+        send =  (Button) findViewById(R.id.button_send);
+        list = (ListView) findViewById(R.id.listView_1);
         list.setDivider(null);
         list.setDividerHeight(0);
         adp = new ChatArrayAdapter(this, R.layout.bubble_layout, userName);
@@ -173,7 +186,6 @@ public class MainActivity extends Activity implements View.OnClickListener
         hideSoftKeyboard();
 
 
-
     }
 
 
@@ -198,11 +210,6 @@ public class MainActivity extends Activity implements View.OnClickListener
     {
         super.onRestart();
 
-        // resets username and picture if they have been changed
-        if (pictureUri != null)
-        {
-            adp = new ChatArrayAdapter(this, R.layout.bubble_layout, userName, pictureUri);
-        }
     }
 
     @Override
@@ -211,8 +218,6 @@ public class MainActivity extends Activity implements View.OnClickListener
         super.onStop();
 
     }
-
-
 
 
     @Override
@@ -237,7 +242,10 @@ public class MainActivity extends Activity implements View.OnClickListener
     protected void onPause()
     {
         super.onPause();
+
     }
+
+
 }
 
 
