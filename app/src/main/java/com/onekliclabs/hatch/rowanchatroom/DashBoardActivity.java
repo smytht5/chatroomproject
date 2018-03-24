@@ -1,6 +1,5 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -34,19 +33,9 @@ public class DashBoardActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
-                startActivity(new Intent(getBaseContext(), MainActivity.class));
+                startService(new Intent(getBaseContext(), MyService.class));
             }
         });
-
-        jHall.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                startActivity(new Intent(getBaseContext(), MainActivity.class));
-            }
-        });
-
 
     }
 
@@ -66,6 +55,4 @@ public class DashBoardActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
-
 }

@@ -21,6 +21,7 @@ import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager.AutoReceiptMode;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -45,43 +46,46 @@ public class Client {
     Gson gson;
     MyService context;
     public static Client instance = null;
+    static ChatRoomActivity chat;
     public static boolean instanceCreated = false;
 
-    public Client(MyService context, String serverAdress, String logiUser,
-                  String passwordser)
-    {
-        this.serverAddress = serverAdress;
-        this.loginUser = logiUser;
-        this.passwordUser = passwordser;
-        this.context = context;
-        init();
-
-    }
-
-    public static Client getInstance(MyService context, String server,
-                                     String user, String pass) {
-
-        if (instance == null) {
-            instance = new Client(context, server, user, pass);
-            instanceCreated = true;
-        }
-        return instance;
-
-    }
 
     public org.jivesoftware.smack.chat.Chat Mychat;
 
     ChatManagerListenerImpl mChatManagerListener;
     MMessageListener mMessageListener;
 
-    String text = "";
-    String mMessage = "", mReceiver = "";
+
+    public Client(ChatRoomActivity chat, MyService context, String serverAddress, String loginUser,
+                  String passwordUser)
+    {
+        this.serverAddress = serverAddress;
+        this.loginUser = loginUser;
+        this.passwordUser = passwordUser;
+        this.context = context;
+        this.chat = chat;
+        init();
+
+    }
+
+    public static Client getInstance(ChatRoomActivity mainActivity, MyService context, String server,
+                                     String user, String pass) {
+
+        if (instance == null) {
+            instance = new Client(mainActivity, context, server, user, pass);
+            instanceCreated = true;
+        }
+        return instance;
+
+    }
 
     static
     {
-        try {
+        try
+        {
             Class.forName("org.jivesoftware.smack.ReconnectionManager");
-        } catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException ex)
+        {
             // problem loading reconnection manager
         }
     }
@@ -89,6 +93,7 @@ public class Client {
     public void init()
     {
         gson = new Gson();
+        chat.setClient(this);
         mMessageListener = new MMessageListener(context);
         mChatManagerListener = new ChatManagerListenerImpl();
         initialiseConnection();
@@ -97,7 +102,6 @@ public class Client {
 
     private void initialiseConnection()
     {
-
         XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
                 .builder();
         config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
@@ -121,91 +125,47 @@ public class Client {
         }).start();
     }
 
-    public void connect(final String caller) {
 
-        AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>() {
+    public void connect(final String caller)
+    {
+
+        @SuppressLint("StaticFieldLeak")
+        AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>()
+        {
             @Override
-            protected synchronized Boolean doInBackground(Void... arg0) {
+            protected synchronized Boolean doInBackground(Void... arg0)
+            {
                 if (connection.isConnected())
                     return false;
                 isconnecting = true;
-                if (isToasted)
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                        @Override
-                        public void run() {
-
-                            Toast.makeText(context,
-                                    caller + "=>connecting....",
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    });
-                Log.d("Connect() Function", caller + "=>connecting....");
 
                 try {
                     connection.connect();
                     DeliveryReceiptManager dm = DeliveryReceiptManager
                             .getInstanceFor(connection);
                     dm.setAutoReceiptMode(AutoReceiptMode.always);
-                    dm.addReceiptReceivedListener(new ReceiptReceivedListener() {
+                    dm.addReceiptReceivedListener(new ReceiptReceivedListener()
+                    {
 
                         @Override
                         public void onReceiptReceived(final String fromid,
                                                       final String toid, final String msgid,
-                                                      final Stanza packet) {
+                                                      final Stanza packet)
+                        {
 
                         }
                     });
                     connected = true;
 
-                } catch (IOException e) {
-                    if (isToasted)
-                        new Handler(Looper.getMainLooper())
-                                .post(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-
-                                        Toast.makeText(
-                                                context,
-                                                "(" + caller + ")"
-                                                        + "IOException: ",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-
-                    Log.e("(" + caller + ")", "IOException: " + e.getMessage());
-                } catch (SmackException e) {
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            Toast.makeText(context,
-                                    "(" + caller + ")" + "SMACKException: ",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    Log.e("(" + caller + ")",
-                            "SMACKException: " + e.getMessage());
-                } catch (XMPPException e) {
-                    if (isToasted)
-
-                        new Handler(Looper.getMainLooper())
-                                .post(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-
-                                        Toast.makeText(
-                                                context,
-                                                "(" + caller + ")"
-                                                        + "XMPPException: ",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                    Log.e("connect(" + caller + ")",
-                            "XMPPException: " + e.getMessage());
-
+                } catch (IOException e)
+                {
+                    Log.e("(" + caller + ") ",  e.getMessage());
+                } catch (SmackException e)
+                {
+                    Log.e("(" + caller + ") ", e.getMessage());
+                } catch (XMPPException e)
+                {
+                    Log.e("(" + caller + ") ",  e.getMessage());;
                 }
                 return isconnecting = false;
             }
@@ -217,7 +177,6 @@ public class Client {
 
         try {
             connection.login(loginUser, passwordUser);
-            Log.i("LOGIN", "Yey! We're connected to the Xmpp server!");
 
         } catch (XMPPException | SmackException | IOException e) {
             e.printStackTrace();
@@ -226,7 +185,8 @@ public class Client {
 
     }
 
-    private class ChatManagerListenerImpl implements ChatManagerListener {
+    private class ChatManagerListenerImpl implements ChatManagerListener
+    {
         @Override
         public void chatCreated(final org.jivesoftware.smack.chat.Chat chat,
                                 final boolean createdLocally) {
@@ -237,20 +197,27 @@ public class Client {
 
     }
 
-    public void sendMessage(String chatMessage) {
+    public void sendMessage(String chatMessage)
+    {
+        Log.d("Sending....", chatMessage);
         String body = gson.toJson(chatMessage);
+
+        Mychat = ChatManager.getInstanceFor(connection).createChat("Receiving Location", mMessageListener);
 
         if (!chat_created) {
             chat_created = true;
         }
+
         final Message message = new Message();
         message.setBody(body);
         message.setType(Message.Type.chat);
 
         try {
-            if (connection.isAuthenticated()) {
+            if (connection.isAuthenticated())
+            {
 
                 Mychat.sendMessage(message);
+                Log.d("Message sent", message.getBody().toString());
 
             } else {
 
@@ -266,9 +233,11 @@ public class Client {
 
     }
 
-    public class XMPPConnectionListener implements ConnectionListener {
+    public class XMPPConnectionListener implements ConnectionListener
+    {
         @Override
-        public void connected(final XMPPConnection connection) {
+        public void connected(final XMPPConnection connection)
+        {
 
             Log.d("xmpp", "Connected!");
             connected = true;
@@ -281,7 +250,8 @@ public class Client {
         public void connectionClosed() {
             if (isToasted)
 
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                new Handler(Looper.getMainLooper()).post(new Runnable()
+                {
 
                     @Override
                     public void run() {
@@ -319,15 +289,15 @@ public class Client {
         }
 
         @Override
-        public void reconnectingIn(int arg0) {
-
+        public void reconnectingIn(int arg0)
+        {
             Log.d("xmpp", "Reconnectingin " + arg0);
-
             loggedin = false;
         }
 
         @Override
-        public void reconnectionFailed(Exception arg0) {
+        public void reconnectionFailed(Exception arg0)
+        {
             if (isToasted)
 
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -348,7 +318,8 @@ public class Client {
         }
 
         @Override
-        public void reconnectionSuccessful() {
+        public void reconnectionSuccessful()
+        {
             if (isToasted)
 
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -401,113 +372,39 @@ public class Client {
 
                         Toast.makeText(context, "Connected!",
                                 Toast.LENGTH_SHORT).show();
-
                     }
                 });
         }
     }
 
-    private class MMessageListener implements ChatMessageListener {
+    private class MMessageListener implements ChatMessageListener
+    {
 
         public MMessageListener(Context contxt) {
         }
 
         @Override
         public void processMessage(final org.jivesoftware.smack.chat.Chat chat,
-                                   final Message message) {
+                                   final Message message)
+        {
             Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '"
                     + message);
 
-            if (message.getType() == Message.Type.chat
-                    && message.getBody() != null) {
-                final ChatBox chatMessage = gson.fromJson(
-                        message.getBody(), ChatBox.class);
+            processMessage(message.getBody().toString());
 
-                processMessage(chatMessage);
-            }
         }
 
-        private void processMessage(final ChatBox chatMessage) {
-
-
+        private void processMessage(final String chatMessage)
+        {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
 
                 @Override
                 public void run() {
-                    //mRun = true;
+                    chat.postReceivedMessage(chatMessage);
+                    Log.d(" Message Received ", chatMessage);
                 }
             });
         }
 
     }
 }
-    /**
-    public void run()
-    {
-
-        mRun = true;
-
-        // create new socket
-        Socket s = new Socket();
-
-        try
-        {
-            //Connect to socket
-            InetSocketAddress sa = new InetSocketAddress("desktop-saf77d2",5222);
-            s.connect(sa, 2000);
-
-            //Get location longitude and latitude
-            //Double longitude = tracker.getLongitude();
-            //Double latitude = tracker.getLatitude();
-
-            try
-            {
-                //Send message to server
-                out = new OutputStreamWriter(s.getOutputStream());
-
-
-                //Get messages sent to server
-                InputStreamReader isr = new InputStreamReader(s.getInputStream());
-                in = new BufferedReader(isr);
-
-                // in this while the client listens for the messages sent by the
-                // server
-                while (mRun)
-                {
-                    serverMessage = in.readLine();
-
-                    if (serverMessage != null && messageListener != null)
-                    {
-                        messageListener.onMessageReceived(serverMessage);
-                    }
-
-                    serverMessage = null;
-                }
-
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '"
-                        + serverMessage + "'");
-            } catch(Exception e)
-            {
-                Log.e("TCP", "S: Error", e);
-            } finally
-            {
-                s.close();
-            }
-
-        }catch(IOException ioe)
-        {
-            Log.e("Code Error", ioe.getMessage());
-
-            messageListener.onErrorMessageReceived();
-        }
-    }
-
-
-    interface OnMessageReceived
-    {
-        void onMessageReceived(String message);
-
-        void onErrorMessageReceived();
-
-    }
-}**/

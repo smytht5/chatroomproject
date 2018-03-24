@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +22,8 @@ import java.util.List;
  */
 public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
 {
-
     private List<ChatBox> messageList;
-
     private String username;
-    private Uri uri;
 
     public ChatArrayAdapter(Context context, int textViewResourceId, String username)
     {
@@ -34,20 +32,6 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
         this.username = username;
 
     }
-
-    public ChatArrayAdapter(Context context, int textViewResourceId, String username, Uri uri)
-    {
-        super(context, textViewResourceId);
-        messageList = new ArrayList<>();
-        this.username = username;
-        this.uri = uri;
-    }
-
-    public void saveState()
-    {
-
-    }
-
 
     @Override
     public void add(ChatBox chatBox)
@@ -84,37 +68,32 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
     public View getView(int position, View convertView,ViewGroup parent)
     {
         View v = convertView;
+        ChatBox messageObj = getItem(position);
 
-        if (v == null) {
+
+        if (messageObj.getType().equals("receive"))
+        {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(R.layout.bubble_layout, parent, false);
+            v = inflater.inflate(R.layout.receive_bubble, parent, false);
+        }else
+        {
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            v = inflater.inflate(R.layout.post_bubble, parent, false);
         }
 
 
+        if(getItem(position) == null)
+            Log.d("Null Reference", "Position: "+ position);
         //initialize local variables
-        ChatBox messageObj = getItem(position);
+
 
         messageObj.initWidgets(v);
 
 
         //set image to new image if profile image was updated
-        Bitmap image = null;
+        Bitmap image = BitmapFactory.decodeResource(v.getResources(), android.R.drawable.ic_menu_add);
+        messageObj.setImageView(image);
 
-        if (uri != null) {
-            InputStream inputStream;
-            try {
-                // get a bitmap from the stream.
-                inputStream = v.getContext().getContentResolver().openInputStream(uri);
-                // show the image to the user
-                image = BitmapFactory.decodeStream(inputStream);
-                messageObj.setImageView(image);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        } else {
-            image = BitmapFactory.decodeResource(v.getResources(), android.R.drawable.ic_menu_add);
-            messageObj.setImageView(image);
-        }
 
         messageObj.setMessageView();
 

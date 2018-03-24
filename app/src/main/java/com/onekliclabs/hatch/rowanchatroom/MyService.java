@@ -14,28 +14,29 @@ import android.os.IBinder;
 
 public class MyService extends Service
 {
-    private static final String DOMAIN = "xmpp.jp";
-    private static final String USERNAME = "admin";
-    private static final String PASSWORD = "admin";
+    private static final String DOMAIN = "ec2-54-198-216-41.compute-1.amazonaws.com";
+    private static final String USERNAME = "Harold";
+    private static final String PASSWORD = "love";
     public static ConnectivityManager cm;
     public static Client xmpp;
     public static boolean ServerchatCreated = false;
     String text = "";
-
+    protected ChatRoomActivity chat;
 
     @Override
     public IBinder onBind(final Intent intent) {
         return new LocalBinder<MyService>(this);
     }
 
-    public Chat chat;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        chat = new ChatRoomActivity();
         cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        xmpp = Client.getInstance(MyService.this, DOMAIN, USERNAME, PASSWORD);
+        xmpp = Client.getInstance(chat,MyService.this, DOMAIN, USERNAME, PASSWORD);
         xmpp.connect("onCreate");
+        startActivity(new Intent(getBaseContext(), chat.getClass()));
     }
 
     @Override

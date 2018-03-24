@@ -13,32 +13,38 @@ import android.widget.TextView;
 public class ChatBox
 {
     private String message;
-    private RadioButton radioButton;
     private ImageView imageView;
     private RoundImageView roundImageView;
     private TextView username;
     private TextView messageView;
     private int position;
+    private String type;
 
-    public ChatBox(String message)
+    public ChatBox(String message, String type)
     {
         super();
-
+        this.type = type;
         this.message = message;
     }
+
 
     // -- To do -- change username
     public void setUserName(String userName)
     {
-        this.username.setText("razorSandwich");
+        this.username.setText("from server");
     }
+
 
     void setPosition(int position)
     {
         this.position = position;
     }
 
-    void setMessageView(){messageView.setText(message);}
+
+    void setMessageView()
+    {
+        messageView.setText(message);
+    }
 
     public void setImageView(Bitmap image)
     {
@@ -51,38 +57,33 @@ public class ChatBox
         return message;
     }
 
-    public int getPositon(){return position;}
+
+    public int getPositon()
+    {
+        return position;
+    }
+
+
+    public String getType()
+    {
+        return type;
+    }
+
 
     public void initWidgets(View view)
     {
-        radioButton = (RadioButton) view.findViewById(R.id.radioButton_like);
-        imageView = (ImageView) view.findViewById(R.id.imageview);
-        username = (TextView) view.findViewById(R.id.textView_username);
-        messageView = (TextView) view.findViewById(R.id.chat_textview);
-    }
 
-    public void addLike()
-    {
-        String text = (String) radioButton.getText();
-        int num = Integer.parseInt(text);
-
-        if (text == null)
+        if(type.equals("receive"))
         {
-            radioButton.setText("1");
-        }else
-            radioButton.setText(num++);
-    }
-
-    public void removeLike()
-    {
-        String text = (String) radioButton.getText();
-        int num = Integer.parseInt(text);
-
-        if (text == null)
-        {
-            radioButton.setText(num--);
+            imageView =  view.findViewById(R.id.imgView_RC);
+            username =  view.findViewById(R.id.txtView_UsrnameRC);
+            messageView =  view.findViewById(R.id.txtView_ChatRC);
+            return;
         }
 
+        imageView = view.findViewById(R.id.imageview);
+        username = view.findViewById(R.id.textView_username);
+        messageView = view.findViewById(R.id.chat_textview);
     }
 
 

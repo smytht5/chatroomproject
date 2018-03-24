@@ -62,7 +62,7 @@ public class ProfileActivity extends Activity
 
                 }
 
-                startActivity(new Intent(getBaseContext(),MainActivity.class));
+                startActivity(new Intent(getBaseContext(),ChatRoomActivity.class));
 
             }
         });

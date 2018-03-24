@@ -1,8 +1,5 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
-import android.app.ActionBar;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -77,7 +74,7 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
         }
 
         //set username first letter uppercase
-        userNameEditText.setText(MainActivity.userName);
+        userNameEditText.setText(ChatRoomActivity.userName);
 
         //listen for user to press done to set new username
         userNameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -92,7 +89,7 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
                     //reset text to changed username
                     userNameEditText.setText(newUserName);
                     //set username above chat bubble to changed username
-                    MainActivity.userName = newUserName;
+                    ChatRoomActivity.userName = newUserName;
 
                     handled = true;
                 }
@@ -143,7 +140,7 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
                     imageButton.setImageBitmap(image);
 
                     // set uri in Main
-                    MainActivity.pictureUri = pictureUri;
+                    ChatRoomActivity.pictureUri = pictureUri;
 
                     //reset fragment space to nothing
                     BlankFragment fragment = new BlankFragment();
@@ -175,7 +172,7 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
                     imageButton.setImageBitmap(image);
 
                     // set uri in Main
-                    MainActivity.pictureUri = pictureUri;
+                    ChatRoomActivity.pictureUri = pictureUri;
 
                     //reset fragment space to nothing
                     BlankFragment fragment = new BlankFragment();

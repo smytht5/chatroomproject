@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical|right"
+    android:padding="5dp">
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="right"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/txtView_UsrnameRC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Username"
+            android:padding="2dp"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/txtView_ChatRC"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bubble_2"
+            android:text="random test text"
+            android:textColor="@android:color/white"
+            android:padding="10dp" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgView_RC"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_margin="5dp"
+        android:src="@android:drawable/ic_menu_add" />
+
+
+</LinearLayout>
