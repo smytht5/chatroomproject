@@ -208,7 +208,7 @@ public class Client {
             chat_created = true;
         }
 
-        final Message message = new Message("mar8_kevin_example@ec2-54-198-216-41.compute-1.amazonaws.com");
+        final Message message = new Message("rowanchat@ec2-54-198-216-41.compute-1.amazonaws.com");
         message.setBody(body);
         message.setType(Message.Type.chat);
         message.setFrom("harold@ec2-54-198-216-41.compute-1.amazonaws.com");
