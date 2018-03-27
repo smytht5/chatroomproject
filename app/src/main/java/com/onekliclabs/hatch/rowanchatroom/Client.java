@@ -105,8 +105,8 @@ public class Client {
         XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
                 .builder();
         config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setServiceName(serverAddress);
-        config.setHost(serverAddress);
+        config.setServiceName("ec2-54-198-216-41.compute-1.amazonaws.com");
+        config.setHost("ec2-54-198-216-41.compute-1.amazonaws.com");
         config.setPort(5222);
         config.setDebuggerEnabled(true);
         XMPPTCPConnection.setUseStreamManagementResumptiodDefault(true);
@@ -202,15 +202,18 @@ public class Client {
         Log.d("Sending....", chatMessage);
         String body = gson.toJson(chatMessage);
 
-        Mychat = ChatManager.getInstanceFor(connection).createChat("Receiving Location", mMessageListener);
+
 
         if (!chat_created) {
             chat_created = true;
         }
 
-        final Message message = new Message();
+        final Message message = new Message("mar8_kevin_example@ec2-54-198-216-41.compute-1.amazonaws.com");
         message.setBody(body);
         message.setType(Message.Type.chat);
+        message.setFrom("harold@ec2-54-198-216-41.compute-1.amazonaws.com");
+
+        Mychat = ChatManager.getInstanceFor(connection).createChat(message.getTo(), mMessageListener);
 
         try {
             if (connection.isAuthenticated())
@@ -390,7 +393,12 @@ public class Client {
             Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '"
                     + message);
 
-            processMessage(message.getBody().toString());
+            try{
+                processMessage(message.getBody().toString());
+            }catch(NullPointerException e)
+            {
+                Log.e("Process Message", e.getMessage());
+            }
 
         }
 
