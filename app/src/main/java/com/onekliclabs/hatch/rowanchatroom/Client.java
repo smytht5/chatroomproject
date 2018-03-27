@@ -105,8 +105,8 @@ public class Client {
         XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
                 .builder();
         config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
-        config.setServiceName("ec2-54-198-216-41.compute-1.amazonaws.com");
-        config.setHost("ec2-54-198-216-41.compute-1.amazonaws.com");
+        config.setServiceName(serverAddress);
+        config.setHost(serverAddress);
         config.setPort(5222);
         config.setDebuggerEnabled(true);
         XMPPTCPConnection.setUseStreamManagementResumptiodDefault(true);
