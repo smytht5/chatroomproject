@@ -3,24 +3,24 @@ package com.onekliclabs.hatch.rowanchatroom;
 
 
 import java.io.IOException;
-
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.chat.ChatManager;
-import org.jivesoftware.smack.chat.ChatManagerListener;
-import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.muc.DiscussionHistory;
+import org.jivesoftware.smackx.muc.MultiUserChat;
+import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager.AutoReceiptMode;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -32,31 +32,32 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 
 
-public class Client {
+public class Client
+{
+    public boolean loggedin = false;
 
     public static boolean connected = false;
-    public boolean loggedin = false;
     public static boolean isconnecting = false;
     public static boolean isToasted = true;
-    private boolean chat_created = false;
-    private String serverAddress;
+
     public static XMPPTCPConnection connection;
     public static String loginUser;
     public static String passwordUser;
-    Gson gson;
-    MyService context;
     public static Client instance = null;
-    static ChatRoomActivity chat;
-    public static boolean instanceCreated = false;
+    public static ChatRoomActivity chat;
 
+    Gson gson;
+    DashBoardActivity context;
 
-    public org.jivesoftware.smack.chat.Chat Mychat;
+    private static MultiUserChat multiUserChat;
+    private boolean chat_created = false;
+    private String serverAddress;
 
-    ChatManagerListenerImpl mChatManagerListener;
+    //public org.jivesoftware.smack.chat.Chat Mychat;
     MMessageListener mMessageListener;
 
 
-    public Client(ChatRoomActivity chat, MyService context, String serverAddress, String loginUser,
+    public Client(ChatRoomActivity chat, DashBoardActivity context, String serverAddress, String loginUser,
                   String passwordUser)
     {
         this.serverAddress = serverAddress;
@@ -68,13 +69,11 @@ public class Client {
 
     }
 
-    public static Client getInstance(ChatRoomActivity mainActivity, MyService context, String server,
+    public static Client getInstance(ChatRoomActivity mainActivity,DashBoardActivity context, String server,
                                      String user, String pass) {
 
-        if (instance == null) {
-            instance = new Client(mainActivity, context, server, user, pass);
-            instanceCreated = true;
-        }
+        instance = new Client(mainActivity, context, server, user, pass);
+
         return instance;
 
     }
@@ -95,7 +94,6 @@ public class Client {
         gson = new Gson();
         chat.setClient(this);
         mMessageListener = new MMessageListener(context);
-        mChatManagerListener = new ChatManagerListenerImpl();
         initialiseConnection();
 
     }
@@ -119,16 +117,23 @@ public class Client {
     public void disconnect() {
         new Thread(new Runnable() {
             @Override
-            public void run() {
+            public void run()
+            {
+                try {
+                    multiUserChat.leave();
+                    Log.d("MultiChat", "room left");
+                } catch (NotConnectedException e) {
+                    e.printStackTrace();
+                }
                 connection.disconnect();
             }
+
         }).start();
     }
 
 
     public void connect(final String caller)
     {
-
         @SuppressLint("StaticFieldLeak")
         AsyncTask<Void, Void, Boolean> connectionThread = new AsyncTask<Void, Void, Boolean>()
         {
@@ -152,7 +157,6 @@ public class Client {
                                                       final String toid, final String msgid,
                                                       final Stanza packet)
                         {
-
                         }
                     });
                     connected = true;
@@ -173,8 +177,8 @@ public class Client {
         connectionThread.execute();
     }
 
-    public void login() {
-
+    public void login()
+    {
         try {
             connection.login(loginUser, passwordUser);
 
@@ -182,45 +186,29 @@ public class Client {
             e.printStackTrace();
         } catch (Exception e) {
         }
-
-    }
-
-    private class ChatManagerListenerImpl implements ChatManagerListener
-    {
-        @Override
-        public void chatCreated(final org.jivesoftware.smack.chat.Chat chat,
-                                final boolean createdLocally) {
-            if (!createdLocally)
-                chat.addMessageListener(mMessageListener);
-
-        }
-
     }
 
     public void sendMessage(String chatMessage)
     {
-        Log.d("Sending....", chatMessage);
         String body = gson.toJson(chatMessage);
 
-
-
-        if (!chat_created) {
+        if (!chat_created)
+        {
             chat_created = true;
         }
 
-        final Message message = new Message("rowanchat@ec2-54-198-216-41.compute-1.amazonaws.com");
+        final Message message = new Message();
         message.setBody(body);
         message.setType(Message.Type.chat);
         message.setFrom("harold@ec2-54-198-216-41.compute-1.amazonaws.com");
 
-        Mychat = ChatManager.getInstanceFor(connection).createChat(message.getTo(), mMessageListener);
-
-        try {
+        try
+        {
             if (connection.isAuthenticated())
             {
 
-                Mychat.sendMessage(message);
-                Log.d("Message sent", message.getBody().toString());
+                multiUserChat.sendMessage(message);
+                Log.d("Message sent", message.getBody());
 
             } else {
 
@@ -241,8 +229,6 @@ public class Client {
         @Override
         public void connected(final XMPPConnection connection)
         {
-
-            Log.d("xmpp", "Connected!");
             connected = true;
             if (!connection.isAuthenticated()) {
                 login();
@@ -286,7 +272,6 @@ public class Client {
                 });
             Log.d("xmpp", "ConnectionClosedOn Error!");
             connected = false;
-
             chat_created = false;
             loggedin = false;
         }
@@ -315,7 +300,6 @@ public class Client {
                 });
             Log.d("xmpp", "ReconnectionFailed!");
             connected = false;
-
             chat_created = false;
             loggedin = false;
         }
@@ -338,81 +322,105 @@ public class Client {
                 });
             Log.d("xmpp", "ReconnectionSuccessful");
             connected = true;
-
             chat_created = false;
             loggedin = false;
         }
 
         @Override
-        public void authenticated(XMPPConnection arg0, boolean arg1) {
+        public void authenticated(XMPPConnection arg0, boolean arg1)
+        {
             Log.d("xmpp", "Authenticated!");
             loggedin = true;
 
-            ChatManager.getInstanceFor(connection).addChatListener(
-                    mChatManagerListener);
+            MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+            DiscussionHistory history = new DiscussionHistory();
+            history.setMaxStanzas(2);
+            multiUserChat = manager.getMultiUserChat(
+                    "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
 
-            chat_created = false;
-            new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-
+            // continue to try and connect until connected or exit
+            while(!multiUserChat.isJoined())
+            {
+                try {
+                    multiUserChat.join("Harold", "******", history,
+                            SmackConfiguration.getDefaultPacketReplyTimeout());
+                } catch (SmackException.NoResponseException e) {
+                    Log.e("Error",e.getMessage());
+                } catch (XMPPException.XMPPErrorException e) {
+                    Log.e("Error",e.getMessage());
+                } catch (SmackException.NotConnectedException e) {
+                    Log.e("Error",e.getMessage());
                 }
-            }).start();
-            if (isToasted)
+                new Thread(new Runnable()
+                {
+
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }).start();
+            }
+            multiUserChat.addMessageListener(mMessageListener);
+            chat_created = false;
+
+
+            if (multiUserChat.isJoined())
+            {
+                Log.d("xmpp", "Connected!");
 
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
 
                     @Override
                     public void run() {
-                        // TODO Auto-generated method stub
-
                         Toast.makeText(context, "Connected!",
                                 Toast.LENGTH_SHORT).show();
                     }
                 });
+            }
         }
     }
 
-    private class MMessageListener implements ChatMessageListener
+    private class MMessageListener implements MessageListener
     {
+        public MMessageListener(Context context)
+        {
 
-        public MMessageListener(Context contxt) {
         }
 
         @Override
-        public void processMessage(final org.jivesoftware.smack.chat.Chat chat,
-                                   final Message message)
+        public void processMessage(Message message)
         {
             Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '"
                     + message);
-
-            try{
-                processMessage(message.getBody().toString());
-            }catch(NullPointerException e)
-            {
-                Log.e("Process Message", e.getMessage());
-            }
-
+            String name = message.getFrom();
+            name = name.substring(0,name.indexOf("@"));
+            processMessage(message.getBody(),name);
         }
 
-        private void processMessage(final String chatMessage)
+        private void processMessage(final String chatMessage, final String name)
         {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
 
                 @Override
                 public void run() {
-                    chat.postReceivedMessage(chatMessage);
-                    Log.d(" Message Received ", chatMessage);
+                    if(chatMessage != null)
+                    {
+                        chat.postReceivedMessage(chatMessage, name);
+                        Log.d(" Message Received ", chatMessage);
+                    }
+
                 }
             });
         }
-
     }
+
+
 }

@@ -1,6 +1,8 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -16,8 +18,26 @@ import android.widget.ImageButton;
 
 public class DashBoardActivity extends AppCompatActivity
 {
+    private static final String DOMAIN = "ec2-54-198-216-41.compute-1.amazonaws.com";
+    private static String USERNAME;
+    private static String PASSWORD;
+    public static Client xmpp;
+
     ImageButton imgbtn;
     Button jHall;
+
+    private static ChatRoomActivity chat;
+
+    public DashBoardActivity()
+    {
+
+    }
+
+    public DashBoardActivity(String username, String password)
+    {
+        USERNAME = username;
+        PASSWORD = password;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState)
@@ -28,15 +48,26 @@ public class DashBoardActivity extends AppCompatActivity
         imgbtn = (ImageButton) findViewById(R.id.imgbtn_Shamrock);
         jHall = (Button) findViewById(R.id.btn_jHall);
 
+
         imgbtn.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
-                startService(new Intent(getBaseContext(), MyService.class));
+                chat = new ChatRoomActivity();
+                xmpp = Client.getInstance(chat,DashBoardActivity.this, DOMAIN, USERNAME, PASSWORD);
+                xmpp.connect("onCreate");
+                startActivity(new Intent(getBaseContext(), chat.getClass()));
             }
         });
 
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        this.setVisible(true);
     }
 
     @Override
@@ -55,4 +86,11 @@ public class DashBoardActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        xmpp.connection.disconnect();
+    }
+
 }

@@ -23,14 +23,11 @@ import java.util.List;
 public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
 {
     private List<ChatBox> messageList;
-    private String username;
 
     public ChatArrayAdapter(Context context, int textViewResourceId, String username)
     {
         super(context, textViewResourceId);
         messageList = new ArrayList<>();
-        this.username = username;
-
     }
 
     @Override
@@ -97,7 +94,7 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
 
         messageObj.setMessageView();
 
-        messageObj.setUserName(username);
+        messageObj.setUsername();
 
         messageObj.setPosition(messageList.size());
 

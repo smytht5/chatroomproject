@@ -4,6 +4,7 @@ package com.onekliclabs.hatch.rowanchatroom;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -40,8 +41,6 @@ public class LoginActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-
-
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
@@ -57,16 +56,19 @@ public class LoginActivity extends Activity
             }
         });
 
-
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         mEmailLoginFormView = findViewById(R.id.email_login_form);
         mSigninButton = findViewById(R.id.email_sign_in_button);
-        mSigninButton.setOnClickListener(new View.OnClickListener() {
+
+        mSigninButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View view)
             {
-                startActivity(new Intent(getBaseContext(), DashBoardActivity.class));
+                Log.d("Login Info", mEmailView.getText().toString()+" password: "+mPasswordView.getText().toString());
+                DashBoardActivity activity = new DashBoardActivity(mEmailView.getText().toString().substring(0,mEmailView.getText().toString().indexOf("@")), mPasswordView.getText().toString());
+                startActivity(new Intent(getBaseContext(), activity.getClass()));
                 LoginActivity.this.finish();
             }
         });

@@ -22,6 +22,8 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import org.jivesoftware.smack.packet.Message;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -100,16 +102,9 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View v)
     {
-        // Start background thread to send message to socket
+        // Start background thread to send message to chat room
         String message = chatText.getText().toString();
-
-        // sends the message to the server
         mClient.sendMessage(message);
-
-        adp.add(new ChatBox(message, "send"));
-
-        //refresh the list
-        adp.notifyDataSetChanged();
         chatText.setText("");
         hideSoftKeyboard();
     }
@@ -130,10 +125,10 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    static void postReceivedMessage(String message)
+    static void postReceivedMessage(String message, String userName)
     {
-        adp.add(new ChatBox(message, "receive"));
-
+        adp.add(new ChatBox(message, "receive", userName));
+        adp.notifyDataSetChanged();
     }
 
     @Override
@@ -151,6 +146,19 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void finish()
+    {
+        super.finish();
+        mClient.disconnect();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mClient.disconnect();
     }
 }
 

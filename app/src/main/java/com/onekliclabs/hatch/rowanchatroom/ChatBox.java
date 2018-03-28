@@ -15,26 +15,24 @@ public class ChatBox
     private String message;
     private ImageView imageView;
     private RoundImageView roundImageView;
-    private TextView username;
+    private TextView usernameView;
     private TextView messageView;
     private int position;
     private String type;
+    private String username;
 
-    public ChatBox(String message, String type)
+    public ChatBox(String message, String type, String username)
     {
         super();
         this.type = type;
         this.message = message;
+        this.username = username;
     }
 
-
-    // -- To do -- change username
-    public void setUserName(String userName)
+    void setUsername()
     {
-        this.username.setText("from server");
+        usernameView.setText(username);
     }
-
-
     void setPosition(int position)
     {
         this.position = position;
@@ -76,13 +74,13 @@ public class ChatBox
         if(type.equals("receive"))
         {
             imageView =  view.findViewById(R.id.imgView_RC);
-            username =  view.findViewById(R.id.txtView_UsrnameRC);
+            usernameView =  view.findViewById(R.id.txtView_UsrnameRC);
             messageView =  view.findViewById(R.id.txtView_ChatRC);
             return;
         }
 
         imageView = view.findViewById(R.id.imageview);
-        username = view.findViewById(R.id.textView_username);
+        usernameView = view.findViewById(R.id.textView_username);
         messageView = view.findViewById(R.id.chat_textview);
     }
 
