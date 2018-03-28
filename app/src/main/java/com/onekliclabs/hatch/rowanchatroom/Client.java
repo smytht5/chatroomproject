@@ -200,7 +200,7 @@ public class Client
         final Message message = new Message();
         message.setBody(body);
         message.setType(Message.Type.chat);
-        message.setFrom("harold@ec2-54-198-216-41.compute-1.amazonaws.com");
+        message.setFrom(loginUser+ "@ec2-54-198-216-41.compute-1.amazonaws.com");
 
         try
         {
@@ -342,7 +342,7 @@ public class Client
             while(!multiUserChat.isJoined())
             {
                 try {
-                    multiUserChat.join("Harold", "******", history,
+                    multiUserChat.join(loginUser, passwordUser, history,
                             SmackConfiguration.getDefaultPacketReplyTimeout());
                 } catch (SmackException.NoResponseException e) {
                     Log.e("Error",e.getMessage());
@@ -401,7 +401,7 @@ public class Client
             Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '"
                     + message);
             String name = message.getFrom();
-            name = name.substring(0,name.indexOf("@"));
+            name = name.substring(name.indexOf("/")+1,name.length());
             processMessage(message.getBody(),name);
         }
 
@@ -413,7 +413,11 @@ public class Client
                 public void run() {
                     if(chatMessage != null)
                     {
-                        chat.postReceivedMessage(chatMessage, name);
+                        if(name.equals(loginUser))
+                            chat.postReceivedMessage(chatMessage, "user",name);
+                        else
+                            chat.postReceivedMessage(chatMessage, "other",name);
+
                         Log.d(" Message Received ", chatMessage);
                     }
 

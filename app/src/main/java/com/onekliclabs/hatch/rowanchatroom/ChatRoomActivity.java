@@ -125,9 +125,9 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    static void postReceivedMessage(String message, String userName)
+    static void postReceivedMessage(String message, String type, String userName)
     {
-        adp.add(new ChatBox(message, "receive", userName));
+        adp.add(new ChatBox(message, type, userName));
         adp.notifyDataSetChanged();
     }
 

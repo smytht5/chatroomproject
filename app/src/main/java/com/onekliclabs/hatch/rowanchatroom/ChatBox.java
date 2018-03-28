@@ -71,17 +71,17 @@ public class ChatBox
     public void initWidgets(View view)
     {
 
-        if(type.equals("receive"))
+        if(type.equals("user"))
         {
-            imageView =  view.findViewById(R.id.imgView_RC);
-            usernameView =  view.findViewById(R.id.txtView_UsrnameRC);
-            messageView =  view.findViewById(R.id.txtView_ChatRC);
+            imageView = view.findViewById(R.id.imageview);
+            usernameView = view.findViewById(R.id.textView_username);
+            messageView = view.findViewById(R.id.chat_textview);
             return;
         }
 
-        imageView = view.findViewById(R.id.imageview);
-        usernameView = view.findViewById(R.id.textView_username);
-        messageView = view.findViewById(R.id.chat_textview);
+        imageView =  view.findViewById(R.id.imgView_RC);
+        usernameView =  view.findViewById(R.id.txtView_UsrnameRC);
+        messageView =  view.findViewById(R.id.txtView_ChatRC);
     }
 
 
