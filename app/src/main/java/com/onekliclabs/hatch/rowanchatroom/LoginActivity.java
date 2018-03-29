@@ -74,30 +74,16 @@ public class LoginActivity extends Activity
 
                 USERNAME = mEmailView.getText().toString().substring(0,mEmailView.getText().toString().indexOf("@"));
                 PASSWORD = mPasswordView.getText().toString();
-                Log.d("Login Info", mEmailView.getText().toString()+" password: "+ mPasswordView.getText().toString());
+                Log.d("Login Info", USERNAME + " , " + PASSWORD);
                 xmpp = Client.getInstance(LoginActivity.this, DOMAIN, USERNAME, PASSWORD);
                 xmpp.connect("onCreate");
-                DashBoardActivity activity = new DashBoardActivity(xmpp);
-                startActivity(new Intent(getBaseContext(), activity.getClass()));
 
-                while (!xmpp.isConnected()) {
+
+                if(xmpp.isConnected())
+                {
+                    DashBoardActivity activity = new DashBoardActivity(xmpp);
+                    startActivity(new Intent(getBaseContext(), activity.getClass()));
                     LoginActivity.this.finish();
-                    new Thread(new Runnable()
-                    {
-
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-                                Thread.sleep(500);
-                            } catch (InterruptedException e)
-                            {
-                                e.printStackTrace();
-                            }
-
-                        }
-                    }).start();
                 }
             }
         });
