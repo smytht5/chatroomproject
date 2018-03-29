@@ -18,9 +18,6 @@ import android.widget.ImageButton;
 
 public class DashBoardActivity extends AppCompatActivity
 {
-    private static final String DOMAIN = "ec2-54-198-216-41.compute-1.amazonaws.com";
-    private static String USERNAME;
-    private static String PASSWORD;
     public static Client xmpp;
 
     ImageButton imgbtn;
@@ -33,10 +30,9 @@ public class DashBoardActivity extends AppCompatActivity
 
     }
 
-    public DashBoardActivity(String username, String password)
+    public DashBoardActivity(Client client)
     {
-        USERNAME = username;
-        PASSWORD = password;
+        xmpp = client;
     }
 
     @Override
@@ -54,9 +50,9 @@ public class DashBoardActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
             {
+
                 chat = new ChatRoomActivity();
-                xmpp = Client.getInstance(chat,DashBoardActivity.this, DOMAIN, USERNAME, PASSWORD);
-                xmpp.connect("onCreate");
+                xmpp.joinGroupChat(chat);
                 startActivity(new Intent(getBaseContext(), chat.getClass()));
             }
         });
@@ -75,7 +71,6 @@ public class DashBoardActivity extends AppCompatActivity
     {
         // Decide what to show in the action bar.
         getMenuInflater().inflate(R.menu.main, menu);
-
         return super.onCreateOptionsMenu(menu);
     }
 

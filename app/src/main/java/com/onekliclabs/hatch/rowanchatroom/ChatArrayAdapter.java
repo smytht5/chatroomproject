@@ -68,14 +68,14 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
         ChatBox messageObj = getItem(position);
 
 
-        if (messageObj.getType().equals("receive"))
-        {
-            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = inflater.inflate(R.layout.receive_bubble, parent, false);
-        }else
+        if (messageObj.getType().equals("user"))
         {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = inflater.inflate(R.layout.post_bubble, parent, false);
+        }else
+        {
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            v = inflater.inflate(R.layout.receive_bubble, parent, false);
         }
 
 

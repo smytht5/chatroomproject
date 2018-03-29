@@ -47,7 +47,7 @@ public class Client
     public static ChatRoomActivity chat;
 
     Gson gson;
-    DashBoardActivity context;
+    LoginActivity context;
 
     private static MultiUserChat multiUserChat;
     private boolean chat_created = false;
@@ -57,7 +57,7 @@ public class Client
     MMessageListener mMessageListener;
 
 
-    public Client(ChatRoomActivity chat, DashBoardActivity context, String serverAddress, String loginUser,
+    public Client(LoginActivity context, String serverAddress, String loginUser,
                   String passwordUser)
     {
         this.serverAddress = serverAddress;
@@ -69,13 +69,10 @@ public class Client
 
     }
 
-    public static Client getInstance(ChatRoomActivity mainActivity,DashBoardActivity context, String server,
+    public static Client getInstance(LoginActivity context, String server,
                                      String user, String pass) {
-
-        instance = new Client(mainActivity, context, server, user, pass);
-
+        instance = new Client( context, server, user, pass);
         return instance;
-
     }
 
     static
@@ -89,10 +86,69 @@ public class Client
         }
     }
 
+    public void joinGroupChat(ChatRoomActivity activity)
+    {
+        chat = activity;
+        chat.setClient(this);
+
+        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+        DiscussionHistory history = new DiscussionHistory();
+        history.setMaxStanzas(2);
+        multiUserChat = manager.getMultiUserChat(
+                "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
+
+        // continue to try and connect until connected or exit
+        while(!multiUserChat.isJoined())
+        {
+            try {
+                multiUserChat.join(loginUser, passwordUser, history,
+                        SmackConfiguration.getDefaultPacketReplyTimeout());
+            } catch (SmackException.NoResponseException e) {
+                Log.e("Error",e.getMessage());
+            } catch (XMPPException.XMPPErrorException e) {
+                Log.e("Error",e.getMessage());
+            } catch (SmackException.NotConnectedException e) {
+                Log.e("Error",e.getMessage());
+            }
+            new Thread(new Runnable()
+            {
+
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                }
+            }).start();
+        }
+        multiUserChat.addMessageListener(mMessageListener);
+
+
+
+        if (multiUserChat.isJoined())
+        {
+            Log.d("xmpp", "Connected!");
+
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                @Override
+                public void run() {
+                    Toast.makeText(context, "Connected!",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
     public void init()
     {
         gson = new Gson();
-        chat.setClient(this);
         mMessageListener = new MMessageListener(context);
         initialiseConnection();
 
@@ -119,16 +175,30 @@ public class Client
             @Override
             public void run()
             {
+                connection.disconnect();
+            }
+
+        }).start();
+    }
+    public void disconnectFromCroupChat() {
+        new Thread(new Runnable() {
+            @Override
+            public void run()
+            {
                 try {
                     multiUserChat.leave();
                     Log.d("MultiChat", "room left");
                 } catch (NotConnectedException e) {
                     e.printStackTrace();
                 }
-                connection.disconnect();
             }
 
         }).start();
+    }
+
+    public boolean isConnected()
+    {
+        return connection.isConnected();
     }
 
 
@@ -331,60 +401,7 @@ public class Client
         {
             Log.d("xmpp", "Authenticated!");
             loggedin = true;
-
-            MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
-            DiscussionHistory history = new DiscussionHistory();
-            history.setMaxStanzas(2);
-            multiUserChat = manager.getMultiUserChat(
-                    "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
-
-            // continue to try and connect until connected or exit
-            while(!multiUserChat.isJoined())
-            {
-                try {
-                    multiUserChat.join(loginUser, passwordUser, history,
-                            SmackConfiguration.getDefaultPacketReplyTimeout());
-                } catch (SmackException.NoResponseException e) {
-                    Log.e("Error",e.getMessage());
-                } catch (XMPPException.XMPPErrorException e) {
-                    Log.e("Error",e.getMessage());
-                } catch (SmackException.NotConnectedException e) {
-                    Log.e("Error",e.getMessage());
-                }
-                new Thread(new Runnable()
-                {
-
-                    @Override
-                    public void run()
-                    {
-                        try
-                        {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e)
-                        {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }).start();
-            }
-            multiUserChat.addMessageListener(mMessageListener);
             chat_created = false;
-
-
-            if (multiUserChat.isJoined())
-            {
-                Log.d("xmpp", "Connected!");
-
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, "Connected!",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
         }
     }
 

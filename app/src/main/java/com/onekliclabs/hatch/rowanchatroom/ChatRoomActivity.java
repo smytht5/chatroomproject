@@ -45,12 +45,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     public static String userName;
     public static Uri pictureUri;
 
-    public ChatRoomActivity()
-    {
-        //default constructor
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -152,13 +146,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     public void finish()
     {
         super.finish();
-        mClient.disconnect();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mClient.disconnect();
+        mClient.disconnectFromCroupChat();
     }
 }
 

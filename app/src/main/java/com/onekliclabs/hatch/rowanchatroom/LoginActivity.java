@@ -30,6 +30,11 @@ public class LoginActivity extends Activity
     private View mProgressView;
     private View mEmailLoginFormView;
 
+    private static final String DOMAIN = "ec2-54-198-216-41.compute-1.amazonaws.com";
+    private static String USERNAME;
+    private static String PASSWORD;
+    public static Client xmpp;
+
     private View mSignOutButtons;
     private View mLoginFormView;
 
@@ -66,10 +71,34 @@ public class LoginActivity extends Activity
             @Override
             public void onClick(View view)
             {
-                Log.d("Login Info", mEmailView.getText().toString()+" password: "+mPasswordView.getText().toString());
-                DashBoardActivity activity = new DashBoardActivity(mEmailView.getText().toString().substring(0,mEmailView.getText().toString().indexOf("@")), mPasswordView.getText().toString());
+
+                USERNAME = mEmailView.getText().toString().substring(0,mEmailView.getText().toString().indexOf("@"));
+                PASSWORD = mPasswordView.getText().toString();
+                Log.d("Login Info", mEmailView.getText().toString()+" password: "+ mPasswordView.getText().toString());
+                xmpp = Client.getInstance(LoginActivity.this, DOMAIN, USERNAME, PASSWORD);
+                xmpp.connect("onCreate");
+                DashBoardActivity activity = new DashBoardActivity(xmpp);
                 startActivity(new Intent(getBaseContext(), activity.getClass()));
-                LoginActivity.this.finish();
+
+                while (!xmpp.isConnected()) {
+                    LoginActivity.this.finish();
+                    new Thread(new Runnable()
+                    {
+
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+                }
             }
         });
 
