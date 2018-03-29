@@ -45,13 +45,25 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     public static String userName;
     public static Uri pictureUri;
 
+    public String title;
+
+    public ChatRoomActivity()
+    {
+        // Default constructor
+    }
+
+    public ChatRoomActivity(String title)
+    {
+        this.title = title;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        getSupportActionBar().setTitle(title);
         //initialize widgets and back button
         initWidgets();
 

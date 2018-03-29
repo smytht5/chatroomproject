@@ -86,7 +86,7 @@ public class Client
         }
     }
 
-    public void joinGroupChat(ChatRoomActivity activity)
+    public void joinGroupChat(ChatRoomActivity activity, String room)
     {
         chat = activity;
         chat.setClient(this);
@@ -94,8 +94,7 @@ public class Client
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
         DiscussionHistory history = new DiscussionHistory();
         history.setMaxStanzas(2);
-        multiUserChat = manager.getMultiUserChat(
-                "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
+        multiUserChat = manager.getMultiUserChat(room);
 
         // continue to try and connect until connected or exit
         while(!multiUserChat.isJoined())

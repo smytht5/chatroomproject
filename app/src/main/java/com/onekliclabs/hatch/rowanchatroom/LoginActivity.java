@@ -13,14 +13,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-/**
- * A login screen that offers login via email/password and via Google+ sign in.
- * <p/>
- * ************ IMPORTANT SETUP NOTES: ************
- * In order for Google+ sign in to work with your app, you must first go to:
- * https://developers.google.com/+/mobile/android/getting-started#step_1_enable_the_google_api
- * and follow the steps in "Step 1" to create an OAuth 2.0 client for your package.
- */
 public class LoginActivity extends Activity
 {
 
@@ -78,17 +70,40 @@ public class LoginActivity extends Activity
                 xmpp = Client.getInstance(LoginActivity.this, DOMAIN, USERNAME, PASSWORD);
                 xmpp.connect("onCreate");
 
+                // continually check for connection while not connected
+                do{
+                    new Thread(new Runnable()
+                    {
 
-                if(xmpp.isConnected())
-                {
-                    DashBoardActivity activity = new DashBoardActivity(xmpp);
-                    startActivity(new Intent(getBaseContext(), activity.getClass()));
-                    LoginActivity.this.finish();
-                }
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                Thread.sleep(100);
+                            } catch (InterruptedException e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    }).start();
+
+                    // check to see if account has connect
+                    if(xmpp.isConnected())
+                    {
+                        // if connected start next activity and destroy this one
+                        DashBoardActivity activity = new DashBoardActivity(xmpp);
+                        startActivity(new Intent(getBaseContext(), activity.getClass()));
+                        LoginActivity.this.finish();
+                    }
+
+
+                }while (!xmpp.isConnected());
+
             }
         });
 
     }
 
 }
-

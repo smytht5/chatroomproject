@@ -16,12 +16,15 @@ import android.widget.ImageButton;
  * Created by Hatch on 3/6/18.
  */
 
-public class DashBoardActivity extends AppCompatActivity
+public class DashBoardActivity extends AppCompatActivity implements View.OnClickListener
 {
-    public static Client xmpp;
+    static Client xmpp;
 
-    ImageButton imgbtn;
-    Button jHall;
+    static ImageButton imgbtn;
+    static Button jHall;
+    static Button rHall;
+    static Button sHall;
+    static Button bHall;
 
     private static ChatRoomActivity chat;
 
@@ -43,20 +46,15 @@ public class DashBoardActivity extends AppCompatActivity
 
         imgbtn = (ImageButton) findViewById(R.id.imgbtn_Shamrock);
         jHall = (Button) findViewById(R.id.btn_jHall);
+        rHall = (Button) findViewById(R.id.btn_rHall);
+        sHall = (Button) findViewById(R.id.btn_sHall);
+        bHall = (Button) findViewById(R.id.btn_bHall);
 
-
-        imgbtn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-
-                chat = new ChatRoomActivity();
-                xmpp.joinGroupChat(chat);
-                startActivity(new Intent(getBaseContext(), chat.getClass()));
-            }
-        });
-
+        imgbtn.setOnClickListener(this);
+        jHall.setOnClickListener(this);
+        rHall.setOnClickListener(this);
+        sHall.setOnClickListener(this);
+        bHall.setOnClickListener(this);
     }
 
     @Override
@@ -87,5 +85,43 @@ public class DashBoardActivity extends AppCompatActivity
         super.onDestroy();
         xmpp.connection.disconnect();
     }
+
+    @Override
+    public void onClick(View view)
+    {
+        int num = imgbtn.getId();
+
+        switch(view.getId())
+        {
+            case R.id.imgbtn_Shamrock:
+                chat = new ChatRoomActivity("Shamrock Talk");
+                xmpp.joinGroupChat(chat, "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
+                startActivity(new Intent(getBaseContext(), chat.getClass()));
+            break;
+            case R.id.btn_jHall:
+                chat = new ChatRoomActivity("James Hall");
+                xmpp.joinGroupChat(chat, "jameshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
+                startActivity(new Intent(getBaseContext(), chat.getClass()));
+            break;
+            case R.id.btn_rHall:
+                chat = new ChatRoomActivity("Robinson Hall");
+                xmpp.joinGroupChat(chat, "robinsonhall@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
+                startActivity(new Intent(getBaseContext(), chat.getClass()));
+                break;
+            case R.id.btn_sHall:
+                chat = new ChatRoomActivity("Science Hall");
+                xmpp.joinGroupChat(chat,"sciencehall@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
+                startActivity(new Intent(getBaseContext(), chat.getClass()));
+                break;
+            case R.id.btn_bHall:
+                chat = new ChatRoomActivity("Business Hall");
+                xmpp.joinGroupChat(chat, "businesshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
+                startActivity(new Intent(getBaseContext(), chat.getClass()));
+                break;
+        }
+
+
+    }
+
 
 }
