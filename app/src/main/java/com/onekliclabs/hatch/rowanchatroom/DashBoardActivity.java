@@ -89,8 +89,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View view)
     {
-        int num = imgbtn.getId();
-
         switch(view.getId())
         {
             case R.id.imgbtn_Shamrock:
