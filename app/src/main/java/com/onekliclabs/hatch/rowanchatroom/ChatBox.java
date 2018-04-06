@@ -8,17 +8,22 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 /**
- * Created by Owner on 7/8/15.
+ * Created by Harold.
+ *
+ * This is the chat box. The chat stores all information needed to post a
+ * message to the current window. This information includes: message, user name,
+ * user image. Also the chat box initializes all views needed to post a message
+ * to the current window.
  */
 public class ChatBox
 {
-    private String message;
     private ImageView imageView;
     private RoundImageView roundImageView;
     private TextView usernameView;
     private TextView messageView;
-    private int position;
-    private String type;
+
+    private String message;
+    private String type;                    // the type of message received from server (message sent by user or another)
     private String username;
 
     public ChatBox(String message, String type, String username)
@@ -29,36 +34,9 @@ public class ChatBox
         this.username = username;
     }
 
-    void setUsername()
-    {
-        usernameView.setText(username);
-    }
-    void setPosition(int position)
-    {
-        this.position = position;
-    }
-
-
-    void setMessageView()
-    {
-        messageView.setText(message);
-    }
-
-    public void setImageView(Bitmap image)
-    {
-        roundImageView = new RoundImageView(image);
-        imageView.setImageDrawable(roundImageView);
-    }
-
     public String getMessage()
     {
         return message;
-    }
-
-
-    public int getPositon()
-    {
-        return position;
     }
 
 
@@ -67,8 +45,15 @@ public class ChatBox
         return type;
     }
 
+    void initInfo(Bitmap image)
+    {
+        usernameView.setText(username);
+        messageView.setText(message);
+        roundImageView = new RoundImageView(image);
+        imageView.setImageDrawable(roundImageView);
+    }
 
-    public void initWidgets(View view)
+    void initWidgets(View view)
     {
 
         if(type.equals("user"))

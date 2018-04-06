@@ -11,6 +11,8 @@ import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -34,47 +36,27 @@ import com.google.gson.Gson;
 
 public class Client
 {
-    public boolean loggedin = false;
+    public boolean loggedin = false;                    // returns true if logged in
 
     public static boolean connected = false;
-    public static boolean isconnecting = false;
+    public static boolean isconnecting = false;         // return true if this client is in the act of connecting
     public static boolean isToasted = true;
-
-    public static XMPPTCPConnection connection;
-    public static String loginUser;
-    public static String passwordUser;
-    public static Client instance = null;
-    public static ChatRoomActivity chat;
+    public static XMPPTCPConnection connection;         // client connection
+    public static String loginUser;                     // user name
+    public static String passwordUser;                  // user password
+    public static ChatRoomActivity chat;                // activity to upload messages to
 
     Gson gson;
-    LoginActivity context;
+    LoginActivity context;                              // base activity
 
-    private static MultiUserChat multiUserChat;
-    private boolean chat_created = false;
-    private String serverAddress;
+    private static MultiUserChat multiUserChat;         // group chat room
+    private String serverAddress;                       // address of the server
 
-    //public org.jivesoftware.smack.chat.Chat Mychat;
-    MMessageListener mMessageListener;
+    public org.jivesoftware.smack.chat.Chat directChat; // direct message creator
+    private MMessageListener mMessageListener;          // listens for incoming messages from group chat
+    private DMessageListener dMessageListener;          // listens for incoming messages from direct message
 
-
-    public Client(LoginActivity context, String serverAddress, String loginUser,
-                  String passwordUser)
-    {
-        this.serverAddress = serverAddress;
-        this.loginUser = loginUser;
-        this.passwordUser = passwordUser;
-        this.context = context;
-        this.chat = chat;
-        init();
-
-    }
-
-    public static Client getInstance(LoginActivity context, String server,
-                                     String user, String pass) {
-        instance = new Client( context, server, user, pass);
-        return instance;
-    }
-
+    // load connection manager
     static
     {
         try
@@ -86,73 +68,25 @@ public class Client
         }
     }
 
-    public void joinGroupChat(ChatRoomActivity activity, String room)
+
+    public Client(LoginActivity context, String serverAddress, String loginUser,
+                  String passwordUser)
     {
-        chat = activity;
-        chat.setClient(this);
-
-        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
-        DiscussionHistory history = new DiscussionHistory();
-        history.setMaxStanzas(2);
-        multiUserChat = manager.getMultiUserChat(room);
-
-        // continue to try and connect until connected or exit
-        while(!multiUserChat.isJoined())
-        {
-            try {
-                multiUserChat.join(loginUser, passwordUser, history,
-                        SmackConfiguration.getDefaultPacketReplyTimeout());
-            } catch (SmackException.NoResponseException e) {
-                Log.e("Error",e.getMessage());
-            } catch (XMPPException.XMPPErrorException e) {
-                Log.e("Error",e.getMessage());
-            } catch (SmackException.NotConnectedException e) {
-                Log.e("Error",e.getMessage());
-            }
-            new Thread(new Runnable()
-            {
-
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        Thread.sleep(500);
-                    } catch (InterruptedException e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                }
-            }).start();
-        }
-        multiUserChat.addMessageListener(mMessageListener);
-
-
-
-        if (multiUserChat.isJoined())
-        {
-            Log.d("xmpp", "Connected!");
-
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                @Override
-                public void run() {
-                    Toast.makeText(context, "Connected!",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-    }
-
-    public void init()
-    {
+        this.serverAddress = serverAddress;
+        this.loginUser = loginUser;
+        this.passwordUser = passwordUser;
+        this.context = context;
         gson = new Gson();
-        mMessageListener = new MMessageListener(context);
+        mMessageListener = new MMessageListener();
+        dMessageListener = new DMessageListener();
         initialiseConnection();
-
     }
 
+
+    /**
+     * Configure XMPP connection data including: server address, port number,
+     * and security settings.
+     */
     private void initialiseConnection()
     {
         XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
@@ -164,12 +98,20 @@ public class Client
         config.setDebuggerEnabled(true);
         XMPPTCPConnection.setUseStreamManagementResumptiodDefault(true);
         XMPPTCPConnection.setUseStreamManagementDefault(true);
+
+        // declare XMPP connection
         connection = new XMPPTCPConnection(config.build());
         XMPPConnectionListener connectionListener = new XMPPConnectionListener();
+
+        // add connection listener
         connection.addConnectionListener(connectionListener);
     }
 
-    public void disconnect() {
+    /**
+     * Disconnect from server.
+     */
+    public void disconnectFromServer()
+    {
         new Thread(new Runnable() {
             @Override
             public void run()
@@ -179,7 +121,11 @@ public class Client
 
         }).start();
     }
-    public void disconnectFromCroupChat() {
+
+    /**
+     * Disconnect from Group Chat Room
+     */
+    public void disconnectFromMultiChat() {
         new Thread(new Runnable() {
             @Override
             public void run()
@@ -195,12 +141,26 @@ public class Client
         }).start();
     }
 
+    /**
+     * Check for XMPP connection
+     * @return true if client is connected to server; false otherwise
+     */
     public boolean isConnected()
     {
         return connection.isConnected();
     }
 
+    /**
+     * Check for MultiUserChat room has been joined
+     * @return true if client is connected to server; false otherwise
+     */
+    public boolean isJoined(){return multiUserChat.isJoined();}
 
+
+    /**
+     * Connects this client to server using AsyncTask
+     * @param caller Class calling this Method
+     */
     public void connect(final String caller)
     {
         @SuppressLint("StaticFieldLeak")
@@ -209,12 +169,18 @@ public class Client
             @Override
             protected synchronized Boolean doInBackground(Void... arg0)
             {
+                // if already connected, return
                 if (connection.isConnected())
                     return false;
+
+                // set client is connecting
                 isconnecting = true;
 
+                // use XMPP connection and connect to server
                 try {
                     connection.connect();
+
+                    // listen for packet response from server
                     DeliveryReceiptManager dm = DeliveryReceiptManager
                             .getInstanceFor(connection);
                     dm.setAutoReceiptMode(AutoReceiptMode.always);
@@ -226,6 +192,7 @@ public class Client
                                                       final String toid, final String msgid,
                                                       final Stanza packet)
                         {
+                            // do nothing with responded packet
                         }
                     });
                     connected = true;
@@ -240,12 +207,16 @@ public class Client
                 {
                     Log.e("(" + caller + ") ",  e.getMessage());;
                 }
+                // connecting is complete
                 return isconnecting = false;
             }
         };
         connectionThread.execute();
     }
 
+    /**
+     * Use XMPP connection to Log into server
+     */
     public void login()
     {
         try {
@@ -254,30 +225,82 @@ public class Client
         } catch (XMPPException | SmackException | IOException e) {
             e.printStackTrace();
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    public void sendMessage(String chatMessage)
+    /**
+     * Use XMPP connection to connect to a created group chat room
+     * @param activity associated with posting messages
+     * @param room name of MultiUserChat room to be connected to
+     */
+    public void joinMultiChat(ChatRoomActivity activity, String room)
     {
+        chat = activity;
+        chat.setClient(this);
+
+        // manager for group chat
+        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+        // retrieves and manages message history of group chat
+        DiscussionHistory history = new DiscussionHistory();
+        // only allow 2 messages to be loaded from history when group is joined
+        history.setMaxStanzas(2);
+        multiUserChat = manager.getMultiUserChat(room);
+
+        // continue to try and connect until connected or exit
+
+        try {
+            // joins group chat room
+            // -- To do -- change loginUser to change user name
+            multiUserChat.join(loginUser, passwordUser, history,
+                    SmackConfiguration.getDefaultPacketReplyTimeout());
+        } catch (SmackException.NoResponseException | XMPPException.XMPPErrorException |
+                SmackException.NotConnectedException e) {
+            Log.e("Error",e.getMessage());
+        }
+        new Thread(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(500);
+                } catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+
+        multiUserChat.addMessageListener(mMessageListener);
+    }
+
+
+    /**
+     * Constructs and sends a message to the group chat room
+     * @param chatMessage the message user wants to send to group
+     */
+    public void sendMultiChatMessage(String chatMessage)
+    {
+        // convert string to json
         String body = gson.toJson(chatMessage);
 
-        if (!chat_created)
-        {
-            chat_created = true;
-        }
-
+        // construct message to send to group chat
         final Message message = new Message();
         message.setBody(body);
         message.setType(Message.Type.chat);
-        message.setFrom(loginUser+ "@ec2-54-198-216-41.compute-1.amazonaws.com");
+        message.setFrom(loginUser + "@"
+                + context.getString(R.string.server));
 
         try
         {
             if (connection.isAuthenticated())
             {
-
                 multiUserChat.sendMessage(message);
-                Log.d("Message sent", message.getBody());
+                Log.d("xmpp.SendMessage()", "msg Sent: " + message.getBody());
 
             } else {
 
@@ -293,6 +316,53 @@ public class Client
 
     }
 
+    /**
+     * Constructs and sends a direct message to specified user
+     * @param chatMessage the message user wants to send to group
+     * @param to reciever user that message is to be delivered to
+     */
+    public void sendDirectMessage(String chatMessage, String to)
+    {
+        // convert string to json
+        String body = gson.toJson(chatMessage);
+
+        // declare user to connect to
+        directChat = ChatManager.getInstanceFor(connection).createChat(
+                to + "@"
+                        + context.getString(R.string.server),
+                dMessageListener);
+
+        // construct message
+        final Message message = new Message(to);
+        message.setBody(body);
+        message.setType(Message.Type.chat);
+
+        try
+        {
+            if (connection.isAuthenticated())
+            {
+                directChat.sendMessage(message);
+                Log.d("xmpp.SendMessage()", "msg Sent: " + message.getBody());
+
+            } else {
+
+                login();
+            }
+        } catch (NotConnectedException e) {
+            Log.e("xmpp.SendMessage()", "msg Not sent!-Not Connected!");
+
+        } catch (Exception e) {
+            Log.e("xmpp.SendMessage()",
+                    "msg Not sent!" + e.getMessage());
+        }
+
+    }
+
+    /**
+     * This is the XMPP connection listener class, this class listens and reports;
+     * connection to the server disconnection from the server,
+     * and reconnection to the server
+     */
     public class XMPPConnectionListener implements ConnectionListener
     {
         @Override
@@ -322,7 +392,6 @@ public class Client
                 });
             Log.d("xmpp", "ConnectionCLosed!");
             connected = false;
-            chat_created = false;
             loggedin = false;
         }
 
@@ -341,7 +410,6 @@ public class Client
                 });
             Log.d("xmpp", "ConnectionClosedOn Error!");
             connected = false;
-            chat_created = false;
             loggedin = false;
         }
 
@@ -369,7 +437,6 @@ public class Client
                 });
             Log.d("xmpp", "ReconnectionFailed!");
             connected = false;
-            chat_created = false;
             loggedin = false;
         }
 
@@ -391,7 +458,6 @@ public class Client
                 });
             Log.d("xmpp", "ReconnectionSuccessful");
             connected = true;
-            chat_created = false;
             loggedin = false;
         }
 
@@ -400,16 +466,15 @@ public class Client
         {
             Log.d("xmpp", "Authenticated!");
             loggedin = true;
-            chat_created = false;
         }
     }
 
+    /**
+     * This is the MultiChat Message listener class, this class listens for incoming
+     * messages and processes those messages
+     */
     private class MMessageListener implements MessageListener
     {
-        public MMessageListener(Context context)
-        {
-
-        }
 
         @Override
         public void processMessage(Message message)
@@ -421,6 +486,11 @@ public class Client
             processMessage(message.getBody(),name);
         }
 
+        /**
+         * Takes the received message and post it to the chat room window
+         * @param chatMessage message to add to view
+         * @param name user this messages was sent by
+         */
         private void processMessage(final String chatMessage, final String name)
         {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -442,5 +512,37 @@ public class Client
         }
     }
 
+    /**
+     * This is the Direct Message listener class, this class listens for incoming
+     * direct messages and processes those messages
+     */
+    private class DMessageListener implements ChatMessageListener {
 
+        @Override
+        public void processMessage(final org.jivesoftware.smack.chat.Chat chat,
+                                   final Message message) {
+            Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '"
+                    + message);
+
+            if (message.getType() == Message.Type.chat
+                    && message.getBody() != null) {
+                final String chatMessage = gson.fromJson(
+                        message.getBody(), String.class);
+
+                processMessage(chatMessage);
+            }
+        }
+
+        private void processMessage(final String chatMessage) {
+
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                @Override
+                public void run() {
+                    // -- To do -- add location to post received direct messages
+
+                }
+            });
+        }
+    }
 }

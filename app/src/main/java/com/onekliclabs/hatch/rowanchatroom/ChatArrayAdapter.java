@@ -18,7 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Owner on 7/8/15.
+ * Created by Harold on 7/8/15.
+ *
+ * This is the chat array adapter. This is the list that a chat box will be added to.
+ * This is a viewable list that is placed inside an activity to view what has been
+ * added to the list.
  */
 public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
 {
@@ -78,31 +82,21 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatBox>
             v = inflater.inflate(R.layout.receive_bubble, parent, false);
         }
 
-
-        if(getItem(position) == null)
-            Log.d("Null Reference", "Position: "+ position);
         //initialize local variables
-
-
         messageObj.initWidgets(v);
 
-
-        //set image to new image if profile image was updated
-        Bitmap image = BitmapFactory.decodeResource(v.getResources(), android.R.drawable.ic_menu_add);
-        messageObj.setImageView(image);
-
-
-        messageObj.setMessageView();
-
-        messageObj.setUsername();
-
-        messageObj.setPosition(messageList.size());
-
+        // after views are in view add according information to them
+        messageObj.initInfo(BitmapFactory.decodeResource(v.getResources(), android.R.drawable.ic_menu_add));
 
         return v;
     }
 
 
+    /**
+     * Decodes image into bits to be sent over server
+     * @param decodedByte image in byte form
+     * @return bit array
+     */
     public Bitmap decodeToBitmap(byte [] decodedByte)
     {
         return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);

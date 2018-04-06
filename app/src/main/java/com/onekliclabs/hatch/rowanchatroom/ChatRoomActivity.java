@@ -89,7 +89,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
      */
     public void initWidgets()
     {
-
         chatText = (EditText) findViewById(R.id.chat_editText);
         send =  (Button) findViewById(R.id.button_send);
         list = (ListView) findViewById(R.id.listView_1);
@@ -110,7 +109,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     {
         // Start background thread to send message to chat room
         String message = chatText.getText().toString();
-        mClient.sendMessage(message);
+        mClient.sendMultiChatMessage(message);
         chatText.setText("");
         hideSoftKeyboard();
     }
@@ -157,8 +156,8 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void finish()
     {
+        mClient.disconnectFromMultiChat();
         super.finish();
-        mClient.disconnectFromCroupChat();
     }
 }
 
