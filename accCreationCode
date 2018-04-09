@@ -1,0 +1,70 @@
+public class createAcc extends AsyncTask<Void,Void,Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+
+                XMPPTCPConnectionConfiguration.Builder connectionConfiguration = XMPPTCPConnectionConfiguration.builder();
+                connectionConfiguration.setHost(DOMAIN);
+                connectionConfiguration.setServiceName(DOMAIN);
+                connectionConfiguration.setConnectTimeout(12000);
+                connectionConfiguration.setSecurityMode(XMPPTCPConnectionConfiguration.SecurityMode.disabled);
+                connectionConfiguration.setPort(5222);
+                connectionConfiguration.setResource("test");
+                connectionConfiguration.setDebuggerEnabled(true);
+
+                connection = new XMPPTCPConnection(connectitener = new XMPPTCPConnectionListener();
+                connection.addConnectionListener(xmpptcpConnectionListener);onConfiguration.build());
+                XMPPTCPConnectionListener xmpptcpConnectionLis
+                Log.e(tag, "connecting started");
+                connection.connect();
+                //AccountManager.getInstance(connection).sensitiveOperationOverInsecureConnection(true);
+                //Map<String,String> attributes = new HashMap<String, String>(2);
+                //attributes.put("name", null);
+                //attributes.put("email", null);
+                AccountManager.getInstance(connection).createAccount(USERNAME, PASSWORD);
+                AccountManager.getInstance(connection).sensitiveOperationOverInsecureConnection(false);
+                Log.e(tag, " Acc Success");
+            }catch (XMPPException e){
+vi            }catch (SmackException | IOException e){
+                Log.e(tag, "Connect_SmackOrIOException " + e.getMessage());
+            }
+            return null;
+        }
+    }
+
+    public class XMPPTCPConnectionListener implements ConnectionListener {
+        @Override
+        public void connected(XMPPConnection connection1) {
+            Log.e(tag,"connected");
+        }
+
+        @Override
+        public void authenticated(XMPPConnection connection, boolean resumed) {
+            Log.e(tag,"authenticated");
+        }
+
+        @Override
+        public void connectionClosed() {
+            Log.e(tag,"connectionClosed");
+        }
+
+        @Override
+        public void connectionClosedOnError(Exception e) {
+            Log.e(tag,"connectionClosedOnError " + e.getMessage());
+        }
+
+        @Override
+        public void reconnectionSuccessful() {
+            Log.e(tag, "reconnectionSuccessful");
+        }
+
+        @Override
+        public void reconnectingIn(int seconds) {
+            Log.e(tag,"reconnectingIn");
+        }
+
+        @Override
+        public void reconnectionFailed(Exception e) {
+            Log.e(tag, "reconnectionFailed " + e.getMessage());
+        }
+    }
