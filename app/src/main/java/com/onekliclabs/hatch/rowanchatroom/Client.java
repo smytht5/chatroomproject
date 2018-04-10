@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
@@ -17,6 +18,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
@@ -56,6 +58,7 @@ public class Client
     private MMessageListener mMessageListener;          // listens for incoming messages from group chat
     private DMessageListener dMessageListener;          // listens for incoming messages from direct message
 
+
     // load connection manager
     static
     {
@@ -91,6 +94,7 @@ public class Client
     {
         XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
                 .builder();
+        config.setDebuggerEnabled(false);
         config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
         config.setServiceName(serverAddress);
         config.setHost(serverAddress);
@@ -101,10 +105,59 @@ public class Client
 
         // declare XMPP connection
         connection = new XMPPTCPConnection(config.build());
-        XMPPConnectionListener connectionListener = new XMPPConnectionListener();
+    }
 
-        // add connection listener
-        connection.addConnectionListener(connectionListener);
+    /**
+     * Use XMPP connection to Log into server
+     */
+    public void login()
+    {
+        if (!isLoggedIn())
+        {
+            try
+            {
+
+                connection.login(loginUser, passwordUser);
+
+            } catch (XMPPException | SmackException | IOException e)
+            {
+                Log.e("Log in Error 1", e.getMessage());
+            } catch (Exception e)
+            {
+                Log.e("Log in Error 2", e.getMessage());
+            }
+
+            // add connection listener
+            XMPPConnectionListener connectionListener = new XMPPConnectionListener();
+            connection.addConnectionListener(connectionListener);
+        }
+        return;
+    }
+
+    public boolean isLoggedIn()
+    {
+        return connection.isAuthenticated();
+    }
+
+
+    public void addAccount()
+    {
+
+        AccountManager accountManager = AccountManager.getInstance(connection);
+
+        try {
+            accountManager.createAccount(loginUser, passwordUser);
+            accountManager.sensitiveOperationOverInsecureConnection(false);
+        } catch (SmackException.NoResponseException e) {
+            Log.e("Account Creation 1", e.getMessage());
+
+        } catch (XMPPException.XMPPErrorException e) {
+            Log.e("Account Creation 2", e.getMessage());
+
+        } catch (NotConnectedException e) {
+            Log.e("Account Creation 3", e.getMessage());
+
+        }
     }
 
     /**
@@ -210,24 +263,18 @@ public class Client
                 // connecting is complete
                 return isconnecting = false;
             }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean)
+            {
+                super.onPostExecute(aBoolean);
+                addAccount();
+                login();
+            }
         };
         connectionThread.execute();
     }
 
-    /**
-     * Use XMPP connection to Log into server
-     */
-    public void login()
-    {
-        try {
-            connection.login(loginUser, passwordUser);
-
-        } catch (XMPPException | SmackException | IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * Use XMPP connection to connect to a created group chat room
@@ -277,7 +324,6 @@ public class Client
 
         multiUserChat.addMessageListener(mMessageListener);
     }
-
 
     /**
      * Constructs and sends a message to the group chat room
@@ -369,9 +415,6 @@ public class Client
         public void connected(final XMPPConnection connection)
         {
             connected = true;
-            if (!connection.isAuthenticated()) {
-                login();
-            }
         }
 
         @Override
@@ -539,8 +582,7 @@ public class Client
 
                 @Override
                 public void run() {
-                    // -- To do -- add location to post received direct messages
-
+                    // -- To do -- add location to post received direct message
                 }
             });
         }

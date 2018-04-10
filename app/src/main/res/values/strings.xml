@@ -23,6 +23,8 @@
     <string name="error_invalid_password">This password is too short</string>
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
-    <string name="title_activity_login">Sign in</string>
+    <string name="title_activity_login">Rowan Chat</string>
     <string name="server">ec2-54-198-216-41.compute-1.amazonaws.com</string>
+    <string name="server_client_id">812635472138-s5v2dtbuk5j5qmbo4ct0hg69437vqg8i.apps.googleusercontent.com</string>
+    <string name="login_error">Incorrect Username/Password please login with rowan account</string>
 </resources>

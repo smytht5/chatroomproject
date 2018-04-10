@@ -22,12 +22,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 {
     static Client xmpp;         // client connected to server
 
-    static ImageButton imgbtn;
-    static Button jHall;
-    static Button rHall;
-    static Button sHall;
-    static Button bHall;
-
     private static ChatRoomActivity chat;
 
     public DashBoardActivity()
@@ -46,19 +40,12 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
-        // initialize buttons
-        imgbtn = (ImageButton) findViewById(R.id.imgbtn_Shamrock);
-        jHall = (Button) findViewById(R.id.btn_jHall);
-        rHall = (Button) findViewById(R.id.btn_rHall);
-        sHall = (Button) findViewById(R.id.btn_sHall);
-        bHall = (Button) findViewById(R.id.btn_bHall);
-
         // set event listeners
-        imgbtn.setOnClickListener(this);
-        jHall.setOnClickListener(this);
-        rHall.setOnClickListener(this);
-        sHall.setOnClickListener(this);
-        bHall.setOnClickListener(this);
+        findViewById(R.id.imgbtn_Shamrock).setOnClickListener(this);
+        findViewById(R.id.btn_jHall).setOnClickListener(this);
+        findViewById(R.id.btn_rHall).setOnClickListener(this);
+        findViewById(R.id.btn_sHall).setOnClickListener(this);
+        findViewById(R.id.btn_bHall).setOnClickListener(this);
     }
 
     @Override
