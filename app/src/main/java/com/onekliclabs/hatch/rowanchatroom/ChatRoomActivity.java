@@ -1,9 +1,11 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -45,7 +47,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     public static String userName;
     public static Uri pictureUri;
 
-    public String title;
+    public static String title;
 
     public ChatRoomActivity()
     {
@@ -64,6 +66,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_main);
 
         getSupportActionBar().setTitle(title);
+
         //initialize widgets and back button
         initWidgets();
 

@@ -80,6 +80,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onClick(View view)
     {
+        view.setClickable(false);
         /*
          * switch/case to connect to a group chat room based on the button
          * that was pressed. when button is pressed XMPP client is connected
@@ -88,6 +89,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         switch(view.getId())
         {
             case R.id.imgbtn_Shamrock:
+
                 chat = new ChatRoomActivity("Shamrock Talk");
                 xmpp.joinMultiChat(chat, "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
 
@@ -139,6 +141,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 break;
         }
 
+        view.setClickable(true);
     }
 
     @Override

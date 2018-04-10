@@ -61,8 +61,8 @@ public class LoginActivity extends Activity implements View.OnClickListener
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        // if(account != null)
-        //     startClient(account);
+        if(account != null)
+             startClient(account);
     }
 
     @Override

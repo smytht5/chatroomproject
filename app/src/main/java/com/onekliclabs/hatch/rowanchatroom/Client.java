@@ -540,14 +540,19 @@ public class Client
 
                 @Override
                 public void run() {
-                    if(chatMessage != null)
-                    {
-                        if(name.equals(loginUser))
-                            chat.postReceivedMessage(chatMessage, "user",name);
-                        else
-                            chat.postReceivedMessage(chatMessage, "other",name);
+                    try{
+                        if(chatMessage != null)
+                        {
+                            if(name.equals(loginUser))
+                                chat.postReceivedMessage(chatMessage, "user",name);
+                            else
+                                chat.postReceivedMessage(chatMessage, "other",name);
 
-                        Log.d(" Message Received ", chatMessage);
+                            Log.d(" Message Received ", chatMessage);
+                        }
+                    }catch (Exception e)
+                    {
+                        Log.e("Exception", e.getMessage());
                     }
 
                 }
