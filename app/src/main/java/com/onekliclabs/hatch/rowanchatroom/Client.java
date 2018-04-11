@@ -44,8 +44,8 @@ public class Client
     public static boolean isconnecting = false;         // return true if this client is in the act of connecting
     public static boolean isToasted = true;
     public static XMPPTCPConnection connection;         // client connection
-    public static String loginUser;                     // user name
-    public static String passwordUser;                  // user password
+    protected static String loginUser;                  // user name
+    protected static String passwordUser;               // user password
     public static ChatRoomActivity chat;                // activity to upload messages to
 
     Gson gson;

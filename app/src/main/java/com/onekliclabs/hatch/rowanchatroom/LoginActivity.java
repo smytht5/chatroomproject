@@ -28,8 +28,6 @@ import static com.google.android.gms.auth.api.signin.GoogleSignIn.getClient;
 public class LoginActivity extends Activity implements View.OnClickListener
 {
     private final String DOMAIN = "ec2-54-198-216-41.compute-1.amazonaws.com";
-    private static String USERNAME;
-    private static String PASSWORD;
     private final int RC_SIGN_IN = 9001;
     public static Client xmpp;
     GoogleSignInClient mGoogleSignInClient;
@@ -108,8 +106,10 @@ public class LoginActivity extends Activity implements View.OnClickListener
             // Signed in successfully, show authenticated UI.
             if(account.getEmail().contains("@students.rowan.edu"))
                 startClient(account);
-            else
+            else {
                 findViewById(R.id.txtview_loginerror).setVisibility(View.VISIBLE);
+                mGoogleSignInClient.signOut();
+            }
 
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
@@ -121,24 +121,14 @@ public class LoginActivity extends Activity implements View.OnClickListener
 
     public void startClient(GoogleSignInAccount account)
     {
+        String username = account.getEmail().substring(0,account.getEmail().indexOf('@'));
+
         // Signed in successfully, show authenticated UI.
-        String name = account.getEmail();
-
-
-        if(name.contains("@")) {
-            USERNAME = name.substring(0,name.indexOf('@'));
-            Log.e("Account Name", "given name: " + USERNAME );
-        }
-        else
-            USERNAME = name;
-
-        PASSWORD = account.getId();
-
-        xmpp = new Client(LoginActivity.this, DOMAIN, USERNAME, PASSWORD);
+        xmpp = new Client(LoginActivity.this, DOMAIN, username, account.getId());
         xmpp.connect("startClient");
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (InterruptedException e)
         {
 

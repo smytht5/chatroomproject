@@ -55,8 +55,9 @@
                 android:text="James Hall" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
                 android:background="@null"
                 android:text=">" />
 
@@ -76,8 +77,9 @@
                 android:text="Robinson Hall" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
                 android:background="@null"
                 android:text=">" />
 
@@ -97,8 +99,9 @@
                 android:text="Science Hall" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
                 android:background="@null"
                 android:text=">" />
 
@@ -117,8 +120,9 @@
                 android:text="Business Hall" />
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
                 android:background="@null"
                 android:text=">" />
 
