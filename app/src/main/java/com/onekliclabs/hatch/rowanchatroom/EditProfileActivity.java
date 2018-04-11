@@ -41,6 +41,9 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
     private ImageButton imageButton;
     private EditText userNameEditText;
 
+
+    static Client xmpp;         // client connected to server
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -90,6 +93,7 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
                     userNameEditText.setText(newUserName);
                     //set username above chat bubble to changed username
                     ChatRoomActivity.userName = newUserName;
+                    xmpp.changeName(newUserName);
 
                     handled = true;
                 }
