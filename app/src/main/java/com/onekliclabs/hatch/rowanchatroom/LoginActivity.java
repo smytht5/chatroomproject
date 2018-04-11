@@ -61,8 +61,10 @@ public class LoginActivity extends Activity implements View.OnClickListener
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if(account != null)
-             startClient(account);
+        if( account != null && account.getEmail().contains(getString(R.string.rowan_email_tag)))
+        {
+            startClient(account);
+        }
     }
 
     @Override
@@ -77,7 +79,8 @@ public class LoginActivity extends Activity implements View.OnClickListener
         }
     }
 
-    private void signIn() {
+    private void signIn()
+    {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -142,7 +145,7 @@ public class LoginActivity extends Activity implements View.OnClickListener
         }
 
         // start next activity and destroy this one
-        DashBoardActivity activity = new DashBoardActivity(xmpp);
+        DashBoardActivity activity = new DashBoardActivity(xmpp, mGoogleSignInClient);
         startActivity(new Intent(getBaseContext(), activity.getClass()));
         LoginActivity.this.finish();
     }

@@ -54,22 +54,6 @@ public class Client
     private static MultiUserChat multiUserChat;         // group chat room
     private String serverAddress;                       // address of the server
 
-    public org.jivesoftware.smack.chat.Chat directChat; // direct message creator
-    private MMessageListener mMessageListener;          // listens for incoming messages from group chat
-    private DMessageListener dMessageListener;          // listens for incoming messages from direct message
-
-
-    // load connection manager
-    static
-    {
-        try
-        {
-            Class.forName("org.jivesoftware.smack.ReconnectionManager");
-        } catch (ClassNotFoundException ex)
-        {
-            // problem loading reconnection manager
-        }
-    }
 
 
     public Client(LoginActivity context, String serverAddress, String loginUser,
@@ -85,6 +69,9 @@ public class Client
         initialiseConnection();
     }
 
+    public org.jivesoftware.smack.chat.Chat directChat; // direct message creator
+    private MMessageListener mMessageListener;          // listens for incoming messages from group chat
+    private DMessageListener dMessageListener;          // listens for incoming messages from direct message
 
     /**
      * Configure XMPP connection data including: server address, port number,
@@ -105,6 +92,20 @@ public class Client
 
         // declare XMPP connection
         connection = new XMPPTCPConnection(config.build());
+    }
+
+
+
+    // load connection manager
+    static
+    {
+        try
+        {
+            Class.forName("org.jivesoftware.smack.ReconnectionManager");
+        } catch (ClassNotFoundException ex)
+        {
+            // problem loading reconnection manager
+        }
     }
 
     /**
@@ -436,6 +437,7 @@ public class Client
             Log.d("xmpp", "ConnectionCLosed!");
             connected = false;
             loggedin = false;
+
         }
 
         @Override
@@ -454,6 +456,7 @@ public class Client
             Log.d("xmpp", "ConnectionClosedOn Error!");
             connected = false;
             loggedin = false;
+
         }
 
         @Override

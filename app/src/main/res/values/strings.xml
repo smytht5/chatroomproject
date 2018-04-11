@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Rowan Chat Room</string>
+    <string name="app_name">Rowan Chat</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
@@ -27,4 +27,5 @@
     <string name="server">ec2-54-198-216-41.compute-1.amazonaws.com</string>
     <string name="server_client_id">812635472138-s5v2dtbuk5j5qmbo4ct0hg69437vqg8i.apps.googleusercontent.com</string>
     <string name="login_error">Incorrect Username/Password please login with rowan account</string>
+    <string name="rowan_email_tag">students.rowan.edu</string>
 </resources>

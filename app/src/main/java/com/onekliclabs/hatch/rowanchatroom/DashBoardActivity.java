@@ -14,14 +14,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+
 /**
  * Created by Hatch on 3/6/18.
  */
 
 public class DashBoardActivity extends AppCompatActivity implements View.OnClickListener
 {
-    static Client xmpp;         // client connected to server
-
+    public static Client xmpp;         // client connected to server
+    public static ConnectivityManager cm;
+    public static GoogleSignInClient google;
     private static ChatRoomActivity chat;
 
     public DashBoardActivity()
@@ -29,9 +32,10 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         // default constructor
     }
 
-    public DashBoardActivity(Client client)
+    public DashBoardActivity(Client xmppClient, GoogleSignInClient googleClient )
     {
-        xmpp = client;
+        xmpp = xmppClient;
+        google = googleClient;
     }
 
     @Override
@@ -40,12 +44,17 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        //manage network connectivity
+        cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
         // set event listeners
         findViewById(R.id.imgbtn_Shamrock).setOnClickListener(this);
         findViewById(R.id.btn_jHall).setOnClickListener(this);
         findViewById(R.id.btn_rHall).setOnClickListener(this);
         findViewById(R.id.btn_sHall).setOnClickListener(this);
         findViewById(R.id.btn_bHall).setOnClickListener(this);
+
+
     }
 
     @Override
@@ -75,6 +84,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     public void onDestroy() {
         super.onDestroy();
         xmpp.connection.disconnect();
+        google.signOut();
     }
 
     @Override
@@ -147,7 +157,8 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void finish()
     {
-        xmpp.disconnectFromServer();
         super.finish();
+        xmpp.disconnectFromServer();
+        google.signOut();
     }
 }
