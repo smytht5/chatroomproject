@@ -326,6 +326,7 @@ public class Client
         multiUserChat.addMessageListener(mMessageListener);
     }
 
+
     /**
      * Constructs and sends a message to the group chat room
      * @param chatMessage the message user wants to send to group
@@ -594,5 +595,9 @@ public class Client
                 }
             });
         }
+    }
+
+    public void changeName(String name){
+        this.loginUser = name;
     }
 }

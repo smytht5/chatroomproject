@@ -8,17 +8,17 @@
 
     <LinearLayout
         android:id="@+id/llayout_chatwindow"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:padding="5dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:clickable="true">
+        android:clickable="true"
+        android:orientation="vertical"
+        android:padding="5dp">
 
         <ListView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/listView_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:focusable="true" />
     </LinearLayout>
 
