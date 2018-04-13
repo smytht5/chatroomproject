@@ -1,5 +1,7 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +16,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -40,7 +43,7 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
 
     private ImageButton imageButton;
     private EditText userNameEditText;
-
+    private Button confirmButton;
 
     static Client xmpp;         // client connected to server
 
@@ -53,9 +56,9 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        imageButton =  (ImageButton) findViewById(R.id.imgbutn_editimage);
+        //imageButton =  (ImageButton) findViewById(R.id.imgbutn_editimage);
         userNameEditText = (EditText) findViewById(R.id.ep_editText_username);
-
+        confirmButton = (Button) findViewById(R.id.ep_button);
         //if user has already chosen picture upload it to image button
         if (pictureUri != null)
         {
@@ -93,7 +96,6 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
                     userNameEditText.setText(newUserName);
                     //set username above chat bubble to changed username
                     ChatRoomActivity.userName = newUserName;
-                    xmpp.changeName(newUserName);
 
                     handled = true;
                 }
@@ -102,20 +104,39 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
         });
 
 
-        //when image button is clicked inflate GetPictureFragment
-        imageButton.setOnClickListener(new View.OnClickListener()
+        //when button is pressed set username to new nickname
+        confirmButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                GetPictureFragment fragment = new GetPictureFragment();
+                String tempName = userNameEditText.getText().toString();
+                if(tempName.trim().length() == 0){
+                    Log.e("NickName error", ": Nickname length 0");
+                    userNameEditText.setError("Username is empty, Please input a valid name");
+                }
+                else {
+                    DashBoardActivity.newName = tempName;
+                    AlertDialog.Builder builder = new AlertDialog.Builder(EditProfileActivity.this);
+                    builder.setCancelable(true);
+                    builder.setTitle("Confirm new nick name");
+                    builder.setMessage("Is the name "+ tempName + " correct?");
+                    builder.setPositiveButton("Confirm",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    finish();
+                                }
+                            });
+                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
 
-                fragmentManager = getFragmentManager();
-
-                //inflate replacement fragment
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_choosepic, fragment)
-                        .commit();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
             }
         });
     }

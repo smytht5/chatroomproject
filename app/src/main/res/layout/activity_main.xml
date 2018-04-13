@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:focusable="true"
     android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:weightSum="1"
-    android:focusable="true">
+    android:weightSum="1">
 
     <LinearLayout
         android:id="@+id/llayout_chatwindow"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:clickable="true"
@@ -23,24 +23,24 @@
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom">
+        android:gravity="bottom"
+        android:orientation="horizontal">
 
         <EditText
             android:id="@+id/chat_editText"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:imeOptions="actionSend"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:imeOptions="actionSend" />
 
         <Button
+            android:id="@+id/button_send"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Send"
-            android:id="@+id/button_send"
-            android:layout_weight="2" />
+            android:layout_weight="2"
+            android:text="Send" />
     </LinearLayout>
 
 </LinearLayout>

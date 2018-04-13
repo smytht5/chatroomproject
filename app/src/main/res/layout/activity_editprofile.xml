@@ -13,20 +13,6 @@
         android:layout_weight="1">
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_vertical|center_horizontal">
-
-            <ImageButton
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:id="@+id/imgbutn_editimage"
-                android:src="@android:drawable/ic_menu_add" />
-        </LinearLayout>
-
-        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -54,6 +40,12 @@
                     android:textColor="@android:color/darker_gray" />
             </LinearLayout>
 
+            <Button
+                android:id="@+id/ep_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Change NickName" />
+
         </LinearLayout>
 
     </LinearLayout>
@@ -74,4 +66,5 @@
             tools:layout="@layout/fragment_blank" />
 
     </LinearLayout>
+
 </LinearLayout>

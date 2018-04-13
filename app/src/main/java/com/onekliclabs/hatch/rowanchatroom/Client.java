@@ -3,6 +3,9 @@ package com.onekliclabs.hatch.rowanchatroom;
 
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
@@ -18,6 +21,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smack.util.TLSUtils;
 import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -82,7 +86,14 @@ public class Client
         XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
                 .builder();
         config.setDebuggerEnabled(false);
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+        config.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
+        try {
+            TLSUtils.acceptAllCertificates(config);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
         config.setServiceName(serverAddress);
         config.setHost(serverAddress);
         config.setPort(5222);
@@ -325,6 +336,56 @@ public class Client
 
         multiUserChat.addMessageListener(mMessageListener);
     }
+
+    /**
+     * Use XMPP connection to connect to a created group chat room
+     * @param activity associated with posting messages
+     * @param room name of MultiUserChat room to be connected to
+     */
+    public void joinMultiChat(ChatRoomActivity activity, String room, String newNickName)
+    {
+        chat = activity;
+        chat.setClient(this);
+
+        // manager for group chat
+        MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
+        // retrieves and manages message history of group chat
+        DiscussionHistory history = new DiscussionHistory();
+        // only allow 2 messages to be loaded from history when group is joined
+        history.setMaxStanzas(2);
+        multiUserChat = manager.getMultiUserChat(room);
+
+        // continue to try and connect until connected or exit
+
+        try {
+            // joins group chat room
+            // -- To do -- change loginUser to change user name
+            multiUserChat.join(newNickName, passwordUser, history,
+                    SmackConfiguration.getDefaultPacketReplyTimeout());
+        } catch (SmackException.NoResponseException | XMPPException.XMPPErrorException |
+                SmackException.NotConnectedException e) {
+            Log.e("Error",e.getMessage());
+        }
+        new Thread(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(500);
+                } catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+
+        multiUserChat.addMessageListener(mMessageListener);
+    }
+
 
 
     /**
@@ -596,8 +657,8 @@ public class Client
             });
         }
     }
-
-    public void changeName(String name){
-        this.loginUser = name;
+    //returns the original username
+    public String getOriginalUserName(){
+        return loginUser;
     }
 }
