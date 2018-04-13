@@ -3,6 +3,9 @@ package com.onekliclabs.hatch.rowanchatroom;
 
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
@@ -18,6 +21,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jivesoftware.smack.util.TLSUtils;
 import org.jivesoftware.smackx.iqregister.AccountManager;
 import org.jivesoftware.smackx.muc.DiscussionHistory;
 import org.jivesoftware.smackx.muc.MultiUserChat;
@@ -82,7 +86,14 @@ public class Client
         XMPPTCPConnectionConfiguration.Builder config = XMPPTCPConnectionConfiguration
                 .builder();
         config.setDebuggerEnabled(false);
-        config.setSecurityMode(ConnectionConfiguration.SecurityMode.disabled);
+        config.setSecurityMode(ConnectionConfiguration.SecurityMode.required);
+        try {
+            TLSUtils.acceptAllCertificates(config);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
         config.setServiceName(serverAddress);
         config.setHost(serverAddress);
         config.setPort(5222);

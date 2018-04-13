@@ -1,36 +1,27 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
-import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.tasks.Task;
 
 import static android.content.ContentValues.TAG;
-import static com.google.android.gms.auth.api.signin.GoogleSignIn.getClient;
 
-public class LoginActivity extends Activity implements View.OnClickListener
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener,GoogleApiClient.OnConnectionFailedListener
 {
     private final String DOMAIN = "ec2-54-198-216-41.compute-1.amazonaws.com";
     private final int RC_SIGN_IN = 9001;
     public static Client xmpp;
-    GoogleSignInClient mGoogleSignInClient;
+    GoogleApiClient mGoogleSignInClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -46,7 +37,10 @@ public class LoginActivity extends Activity implements View.OnClickListener
                 .build();
 
         // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
+                .build();
 
         // set listeners
         findViewById(R.id.sign_in_button).setOnClickListener(this);
@@ -58,10 +52,15 @@ public class LoginActivity extends Activity implements View.OnClickListener
         super.onStart();
         // Check for existing Google Sign In account, if the user is already signed in
         // the GoogleSignInAccount will be non-null.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if( account != null && account.getEmail().contains(getString(R.string.rowan_email_tag)))
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleSignInClient);
+        GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(signInIntent);
+
+        if( result != null )
         {
-            startClient(account);
+            GoogleSignInAccount account = result.getSignInAccount();
+
+            if (account.getEmail().contains(getString(R.string.rowan_email_tag)))
+                startClient(account);
         }
     }
 
@@ -79,7 +78,7 @@ public class LoginActivity extends Activity implements View.OnClickListener
 
     private void signIn()
     {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleSignInClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
@@ -92,29 +91,29 @@ public class LoginActivity extends Activity implements View.OnClickListener
         if (requestCode == RC_SIGN_IN) {
             // The Task returned from this call is always completed, no need to attach
             // a listener.
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
         }
     }
 
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask)
+    private void handleSignInResult(GoogleSignInResult result)
     {
-        try
+        if(result.isSuccess())
         {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+            GoogleSignInAccount account = result.getSignInAccount();
 
             // Signed in successfully, show authenticated UI.
             if(account.getEmail().contains("@students.rowan.edu"))
                 startClient(account);
             else {
                 findViewById(R.id.txtview_loginerror).setVisibility(View.VISIBLE);
-                mGoogleSignInClient.signOut();
+                Auth.GoogleSignInApi.signOut(mGoogleSignInClient);
             }
 
-        } catch (ApiException e) {
+        } else {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            Log.w(TAG, "signInResult:failed code=" + result.getStatus().getStatusCode());
             //updateUI(null);
         }
     }
@@ -122,7 +121,6 @@ public class LoginActivity extends Activity implements View.OnClickListener
     public void startClient(GoogleSignInAccount account)
     {
         String username = account.getEmail().substring(0,account.getEmail().indexOf('@'));
-
         // Signed in successfully, show authenticated UI.
         xmpp = new Client(LoginActivity.this, DOMAIN, username, account.getId());
         xmpp.connect("startClient");
@@ -131,12 +129,17 @@ public class LoginActivity extends Activity implements View.OnClickListener
             Thread.sleep(500);
         } catch (InterruptedException e)
         {
-
+            e.printStackTrace();
         }
 
         // start next activity and destroy this one
         DashBoardActivity activity = new DashBoardActivity(xmpp, mGoogleSignInClient);
         startActivity(new Intent(getBaseContext(), activity.getClass()));
         LoginActivity.this.finish();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 }

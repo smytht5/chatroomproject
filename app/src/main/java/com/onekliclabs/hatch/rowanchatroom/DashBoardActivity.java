@@ -1,6 +1,5 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -11,10 +10,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Created by Hatch on 3/6/18.
@@ -24,7 +21,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
 {
     public static Client xmpp;         // client connected to server
     public static ConnectivityManager cm;
-    public static GoogleSignInClient google;
+    public static GoogleApiClient google;
     private static ChatRoomActivity chat;
 
     public DashBoardActivity()
@@ -32,7 +29,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         // default constructor
     }
 
-    public DashBoardActivity(Client xmppClient, GoogleSignInClient googleClient )
+    public DashBoardActivity(Client xmppClient, GoogleApiClient googleClient )
     {
         xmpp = xmppClient;
         google = googleClient;
@@ -83,8 +80,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     @Override
     public void onDestroy() {
         super.onDestroy();
-        xmpp.connection.disconnect();
-        google.signOut();
+        Auth.GoogleSignInApi.signOut(google);
     }
 
     @Override
@@ -159,6 +155,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     {
         super.finish();
         xmpp.disconnectFromServer();
-        google.signOut();
+        Auth.GoogleSignInApi.signOut(google);
     }
 }

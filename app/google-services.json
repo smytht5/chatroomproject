@@ -1,7 +1,7 @@
-{"installed":
-{"client_id":"703394960084-gfqn94d2uph18glcmru3eahpiud25ei6.apps.googleusercontent.com",
+{"web":
+{"client_id":"703394960084-1giaq6gm0r5mioi8l9pjkrd0de140haf.apps.googleusercontent.com",
   "project_id":"rowan-chat-1523241811038",
   "auth_uri":"https://accounts.google.com/o/oauth2/auth",
   "token_uri":"https://accounts.google.com/o/oauth2/token",
   "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
-  "redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]}}
+  "client_secret":"zzuNS1lPPWCcJaTS03Wh8MX0"}}

@@ -64,7 +64,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         getSupportActionBar().setTitle(title);
 
         //initialize widgets and back button
