@@ -485,20 +485,6 @@ public class Client
 
         @Override
         public void connectionClosed() {
-            if (isToasted)
-
-                new Handler(Looper.getMainLooper()).post(new Runnable()
-                {
-
-                    @Override
-                    public void run() {
-                        // TODO Auto-generated method stub
-
-                        Toast.makeText(context, "ConnectionCLosed!",
-                                Toast.LENGTH_SHORT).show();
-
-                    }
-                });
             Log.d("xmpp", "ConnectionCLosed!");
             connected = false;
             loggedin = false;
@@ -507,17 +493,6 @@ public class Client
 
         @Override
         public void connectionClosedOnError(Exception arg0) {
-            if (isToasted)
-
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        Toast.makeText(context, "ConnectionClosedOn Error!!",
-                                Toast.LENGTH_SHORT).show();
-
-                    }
-                });
             Log.d("xmpp", "ConnectionClosedOn Error!");
             connected = false;
             loggedin = false;
@@ -554,19 +529,6 @@ public class Client
         @Override
         public void reconnectionSuccessful()
         {
-            if (isToasted)
-
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // TODO Auto-generated method stub
-
-                        Toast.makeText(context, "REConnected!",
-                                Toast.LENGTH_SHORT).show();
-
-                    }
-                });
             Log.d("xmpp", "ReconnectionSuccessful");
             connected = true;
             loggedin = false;
