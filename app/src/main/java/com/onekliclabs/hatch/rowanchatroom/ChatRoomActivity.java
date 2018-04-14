@@ -1,41 +1,24 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.database.DataSetObserver;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
-import android.util.AttributeSet;
-import android.view.Menu;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.RadioButton;
-import android.widget.Toast;
-
-import org.jivesoftware.smack.packet.Message;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 
 /**
  * Created by Harold Hatch on 7/8/15.
  */
-public class ChatRoomActivity extends AppCompatActivity implements View.OnClickListener
+public class ChatRoomActivity extends AppCompatActivity implements View.OnClickListener, OnKeyListener
 {
     protected static ChatArrayAdapter adp;
     protected static Client mClient;
@@ -71,6 +54,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         //listener if user presses send
         send.setOnClickListener(this);
+        chatText.setOnKeyListener(this);
 
 
         //keep scrolled to the bottom
@@ -111,9 +95,12 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     {
         // Start background thread to send message to chat room
         String message = chatText.getText().toString();
-        mClient.sendMultiChatMessage(message);
-        chatText.setText("");
-        hideSoftKeyboard();
+        if(!message.equals(""))
+        {
+            mClient.sendMultiChatMessage(message);
+            chatText.setText("");
+            hideSoftKeyboard();
+        }
     }
 
     /**
@@ -134,7 +121,14 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     static void postReceivedMessage(String message, String type, String userName)
     {
-        adp.add(new ChatBox(message, type, userName));
+        String nmessage = message.trim();
+
+        if(nmessage.contains("\\u0027"))
+            nmessage = nmessage.replace("\\u0027", "'");
+
+        nmessage = nmessage.replaceAll("^\"|\"$","");
+
+        adp.add(new ChatBox(nmessage, type, userName));
         adp.notifyDataSetChanged();
     }
 
@@ -160,6 +154,18 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     {
         mClient.disconnectFromMultiChat();
         super.finish();
+    }
+
+
+    @Override
+    public boolean onKey(View v, int keyCode, KeyEvent event)
+    {
+        if(keyCode == KeyEvent.KEYCODE_ENTER)
+        {
+            onClick(v);
+            return true;
+        }
+        return false;
     }
 }
 

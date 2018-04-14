@@ -9,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
+import org.jivesoftware.smack.ReconnectionManager;
 import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
@@ -77,6 +78,18 @@ public class Client
     private MMessageListener mMessageListener;          // listens for incoming messages from group chat
     private DMessageListener dMessageListener;          // listens for incoming messages from direct message
 
+    // load connection manager
+    static
+    {
+        try
+        {
+            Class.forName("org.jivesoftware.smack.ReconnectionManager");
+        } catch (ClassNotFoundException ex)
+        {
+            // problem loading reconnection manager
+        }
+    }
+
     /**
      * Configure XMPP connection data including: server address, port number,
      * and security settings.
@@ -103,21 +116,12 @@ public class Client
 
         // declare XMPP connection
         connection = new XMPPTCPConnection(config.build());
+        ReconnectionManager rmanager = ReconnectionManager.getInstanceFor(connection);
+        rmanager.enableAutomaticReconnection();
+        rmanager.setEnabledPerDefault(true);
     }
 
 
-
-    // load connection manager
-    static
-    {
-        try
-        {
-            Class.forName("org.jivesoftware.smack.ReconnectionManager");
-        } catch (ClassNotFoundException ex)
-        {
-            // problem loading reconnection manager
-        }
-    }
 
     /**
      * Use XMPP connection to Log into server
@@ -128,7 +132,6 @@ public class Client
         {
             try
             {
-
                 connection.login(loginUser, passwordUser);
 
             } catch (XMPPException | SmackException | IOException e)
