@@ -116,7 +116,7 @@ public class EditProfileActivity extends AppCompatActivity implements GetPicture
                     userNameEditText.setError("Username is empty, Please input a valid name");
                 }
                 else {
-                    DashBoardActivity.newName = tempName;
+                    DashBoardActivity.nickName = tempName;
                     AlertDialog.Builder builder = new AlertDialog.Builder(EditProfileActivity.this);
                     builder.setCancelable(true);
                     builder.setTitle("Confirm new nick name");

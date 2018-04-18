@@ -24,7 +24,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     public static GoogleApiClient google;
     private static ChatRoomActivity chat;
 
-    public static String newName;
+    public static String nickName;
 
     public DashBoardActivity()
     {
@@ -35,7 +35,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
     {
         xmpp = xmppClient;
         google = googleClient;
-        newName = xmpp.getOriginalUserName();
+        nickName = xmpp.getOriginalUserName();
     }
 
     @Override
@@ -53,8 +53,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         findViewById(R.id.btn_rHall).setOnClickListener(this);
         findViewById(R.id.btn_sHall).setOnClickListener(this);
         findViewById(R.id.btn_bHall).setOnClickListener(this);
-
-
     }
 
     @Override
@@ -100,8 +98,8 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
             case R.id.imgbtn_Shamrock:
 
                 chat = new ChatRoomActivity("Shamrock Talk");
-                Log.i("newUserName", newName);
-                xmpp.joinMultiChat(chat, "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com", newName);
+                Log.i("newUserName", nickName);
+                xmpp.joinMultiChat(chat, "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com", nickName);
 
                 // check if joining was successful else throw error
                 if(xmpp.isJoined())
@@ -111,7 +109,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
             break;
             case R.id.btn_jHall:
                 chat = new ChatRoomActivity("James Hall");
-                xmpp.joinMultiChat(chat, "jameshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",newName);
+                xmpp.joinMultiChat(chat, "jameshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",nickName);
 
                 // check if joining was successful else throw error
                 if(xmpp.isJoined())
@@ -121,7 +119,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
             break;
             case R.id.btn_rHall:
                 chat = new ChatRoomActivity("Robinson Hall");
-                xmpp.joinMultiChat(chat, "robinsonhall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",newName);
+                xmpp.joinMultiChat(chat, "robinsonhall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",nickName);
 
                 // check if joining was successful else throw error
                 if(xmpp.isJoined())
@@ -131,7 +129,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 break;
             case R.id.btn_sHall:
                 chat = new ChatRoomActivity("Science Hall");
-                xmpp.joinMultiChat(chat,"sciencehall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",newName);
+                xmpp.joinMultiChat(chat,"sciencehall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",nickName);
 
                 // check if joining was successful else throw error
                 if(xmpp.isJoined())
@@ -141,7 +139,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                 break;
             case R.id.btn_bHall:
                 chat = new ChatRoomActivity("Business Hall");
-                xmpp.joinMultiChat(chat, "businesshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",newName);
+                xmpp.joinMultiChat(chat, "businesshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",nickName);
 
                 // check if joining was successful else throw error
                 if(xmpp.isJoined())
