@@ -1,22 +1,20 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
-
-
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.ReconnectionManager;
-import org.jivesoftware.smack.SASLAuthentication;
 import org.jivesoftware.smack.SmackConfiguration;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.chat.Chat;
 import org.jivesoftware.smack.chat.ChatManager;
+import org.jivesoftware.smack.chat.ChatManagerListener;
 import org.jivesoftware.smack.chat.ChatMessageListener;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.packet.Stanza;
@@ -30,21 +28,18 @@ import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager;
 import org.jivesoftware.smackx.receipts.DeliveryReceiptManager.AutoReceiptMode;
 import org.jivesoftware.smackx.receipts.ReceiptReceivedListener;
+import org.jxmpp.util.XmppStringUtils;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
-
 import com.google.gson.Gson;
-
 
 public class Client
 {
     public boolean loggedin = false;                    // returns true if logged in
-
     public static boolean connected = false;
     public static boolean isconnecting = false;         // return true if this client is in the act of connecting
     public static boolean isToasted = true;
@@ -52,15 +47,14 @@ public class Client
     protected static String loginUser;// user name
     protected static String passwordUser;
     public static String nickName;// user password
-    public static ChatRoomActivity chat;                // activity to upload messages to
+    public static ChatRoomActivity chatActivity;                // activity to upload messages to
 
     Gson gson;
     LoginActivity context;                              // base activity
 
     private static MultiUserChat multiUserChat;         // group chat room
+    private static Chat directChat; // direct message creator
     private String serverAddress;                       // address of the server
-
-
 
     public Client(LoginActivity context, String serverAddress, String loginUser,
                   String passwordUser)
@@ -75,7 +69,6 @@ public class Client
         initialiseConnection();
     }
 
-    public org.jivesoftware.smack.chat.Chat directChat; // direct message creator
     private MMessageListener mMessageListener;          // listens for incoming messages from group chat
     private DMessageListener dMessageListener;          // listens for incoming messages from direct message
 
@@ -120,9 +113,50 @@ public class Client
         ReconnectionManager rmanager = ReconnectionManager.getInstanceFor(connection);
         rmanager.enableAutomaticReconnection();
         rmanager.setEnabledPerDefault(true);
+
+        ChatManagerListener chatManagerListener = new ChatManagerListener()
+        {
+            @Override
+            public void chatCreated(Chat chat, boolean createdLocally)
+            {
+
+                chat.addMessageListener(
+                        new ChatMessageListener()
+                        {
+                            @Override
+                            public void processMessage(final Chat chat,
+                                                       final Message message)
+                            {
+                                Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '"
+                                        + message);
+
+                                if (message.getType().equals(Message.Type.chat)
+                                        && !message.getBody().equals(null))
+                                {
+                                    final String chatMessage = gson.fromJson(message.getBody(), String.class);
+
+                                    processMessage(chatMessage, message.getFrom().substring(message.getFrom().indexOf('/')+1));
+                                }
+                            }
+
+                            private void processMessage(final String chatMessage, final  String userName) {
+
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+                                    @Override
+                                    public void run()
+                                    {
+                                        chatActivity.directMessageAlert(chatMessage, userName);
+                                    }
+                                });
+                            }
+                        });
+            }
+        };
+
+        ChatManager.getInstanceFor(connection).addChatListener(chatManagerListener);
+
     }
-
-
 
     /**
      * Use XMPP connection to Log into server
@@ -299,8 +333,8 @@ public class Client
     public void joinMultiChat(ChatRoomActivity activity, String room, String nickName)
     {
         this.nickName = nickName;
-        chat = activity;
-        chat.setClient(this);
+        chatActivity = activity;
+        chatActivity.setClient(this);
 
         // manager for group chat
         MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
@@ -309,7 +343,6 @@ public class Client
         // only allow 2 messages to be loaded from history when group is joined
         history.setMaxStanzas(2);
         multiUserChat = manager.getMultiUserChat(room);
-
         // continue to try and connect until connected or exit
 
         try {
@@ -341,11 +374,9 @@ public class Client
         multiUserChat.addMessageListener(mMessageListener);
     }
 
-
-
     /**
-     * Constructs and sends a message to the group chat room
-     * @param chatMessage the message user wants to send to group
+     * Constructs and sends a message to the specified chat room
+     * @param chatMessage message the user wants to send to room
      */
     public void sendMultiChatMessage(String chatMessage)
     {
@@ -364,8 +395,6 @@ public class Client
             if (connection.isAuthenticated())
             {
                 multiUserChat.sendMessage(message);
-                Log.d("xmpp.SendMessage()", "msg Sent: " + message.getBody());
-
             } else {
 
                 login();
@@ -377,27 +406,25 @@ public class Client
             Log.e("xmpp.SendMessage()",
                     "msg Not sent!" + e.getMessage());
         }
-
     }
+
 
     /**
      * Constructs and sends a direct message to specified user
      * @param chatMessage the message user wants to send to group
-     * @param to reciever user that message is to be delivered to
+     * @param jid of multi chat user that message is to be delivered to
      */
-    public void sendDirectMessage(String chatMessage, String to)
+    public void sendDirectMessage(String chatMessage, String jid)
     {
         // convert string to json
         String body = gson.toJson(chatMessage);
 
         // declare user to connect to
-        directChat = ChatManager.getInstanceFor(connection).createChat(
-                to + "@"
-                        + context.getString(R.string.server),
-                dMessageListener);
+        directChat = multiUserChat.createPrivateChat(jid, dMessageListener);
 
+        Log.e("Nickname ", XmppStringUtils.parseLocalpart(jid));
         // construct message
-        final Message message = new Message(to);
+        final Message message = new Message();
         message.setBody(body);
         message.setType(Message.Type.chat);
 
@@ -406,8 +433,6 @@ public class Client
             if (connection.isAuthenticated())
             {
                 directChat.sendMessage(message);
-                Log.d("xmpp.SendMessage()", "msg Sent: " + message.getBody());
-
             } else {
 
                 login();
@@ -506,6 +531,7 @@ public class Client
         {
             Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '"
                     + message);
+
             String name = message.getFrom();
             name = name.substring(name.indexOf("/")+1,name.length());
             processMessage(message.getBody(),name);
@@ -526,11 +552,9 @@ public class Client
                         if(chatMessage != null)
                         {
                             if(name.equals(nickName))
-                                chat.postReceivedMessage(chatMessage, "user",name);
+                                chatActivity.postReceivedMessage(chatMessage, "user",name);
                             else
-                                chat.postReceivedMessage(chatMessage, "other",name);
-
-                            Log.d(" Message Received ", chatMessage);
+                                chatActivity.postReceivedMessage(chatMessage, "other",name);
                         }
                     }catch (Exception e)
                     {
@@ -549,27 +573,18 @@ public class Client
     private class DMessageListener implements ChatMessageListener {
 
         @Override
-        public void processMessage(final org.jivesoftware.smack.chat.Chat chat,
-                                   final Message message) {
-            Log.i("MyXMPP_MESSAGE_LISTENER", "Xmpp message received: '"
-                    + message);
-
-            if (message.getType() == Message.Type.chat
-                    && message.getBody() != null) {
-                final String chatMessage = gson.fromJson(
-                        message.getBody(), String.class);
-
-                processMessage(chatMessage);
-            }
+        public void processMessage(final Chat chat,
+                                   final Message message)
+        {
         }
 
-        private void processMessage(final String chatMessage) {
+        private void processMessage(final String chatMessage, final  String userName) {
 
             new Handler(Looper.getMainLooper()).post(new Runnable() {
 
                 @Override
-                public void run() {
-                    // -- To do -- add location to post received direct message
+                public void run()
+                {
                 }
             });
         }

@@ -8,13 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-
-import static android.content.ContentValues.TAG;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener,GoogleApiClient.OnConnectionFailedListener
 {
@@ -60,7 +57,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             //GoogleSignInAccount account = result.getSignInAccount();
 
             //if (account.getEmail().contains(getString(R.string.rowan_email_tag)))
-                startClient("default");//account);
+                startClient("default48");//account);
         //}
     }
 
@@ -81,7 +78,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleSignInClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-    /*
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -98,6 +95,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void handleSignInResult(GoogleSignInResult result)
     {
+        /*
         if(result.isSuccess())
         {
             GoogleSignInAccount account = result.getSignInAccount();
@@ -115,14 +113,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + result.getStatus().getStatusCode());
             //updateUI(null);
-        }
-    }*/
+        }*/
+    }
 
-    public void startClient(String username)//GoogleSignInAccount account)
+    public void startClient(String name)//GoogleSignInAccount account)
     {
-        //String username = account.getEmail().substring(0,account.getEmail().indexOf('@'));
+        String username = name;//account.getEmail().substring(0,account.getEmail().indexOf('@'));
         // Signed in successfully, show authenticated UI.
-        xmpp = new Client(LoginActivity.this, DOMAIN, username, "pasword");//account.getId());
+        xmpp = new Client(LoginActivity.this, DOMAIN, username,"password"); //account.getId());
         xmpp.connect("startClient");
 
         try {

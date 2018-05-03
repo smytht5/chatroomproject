@@ -1,9 +1,11 @@
 package com.onekliclabs.hatch.rowanchatroom;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -13,7 +15,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * Created by Harold Hatch on 7/8/15.
@@ -25,9 +29,13 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
     private ListView list;
     private EditText chatText;
+    private TextView tview;
     private Button send;
 
+    private static Context context;
+
     public static String userName;
+    public static String room;
     public static Uri pictureUri;
 
     public static String title;
@@ -37,9 +45,10 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         // Default constructor
     }
 
-    public ChatRoomActivity(String title)
+    public ChatRoomActivity(String title, String room)
     {
         this.title = title;
+        this.room = room;
     }
 
     @Override
@@ -55,7 +64,6 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         //listener if user presses send
         send.setOnClickListener(this);
         chatText.setOnKeyListener(this);
-
 
         //keep scrolled to the bottom
         list.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
@@ -81,6 +89,7 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         list.setDivider(null);
         list.setDividerHeight(0);
         adp = new ChatArrayAdapter(this, R.layout.post_bubble, userName);
+        context = this;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
     }
@@ -94,14 +103,57 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View v)
     {
         // Start background thread to send message to chat room
-        String message = chatText.getText().toString();
-        if(!message.equals(""))
-        {
-            mClient.sendMultiChatMessage(message);
-            chatText.setText("");
-            hideSoftKeyboard();
+        int id = v.getId();
+
+        switch (id) {
+            case R.id.txtView_UsrnameRC:
+                userName = ((TextView) findViewById(id)).getText().toString();
+                final String jid = room + "/" + userName;
+                final LinearLayout layout = new LinearLayout(context);
+                layout.setOrientation(LinearLayout.VERTICAL);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                params.setMargins(50, 0, 50, 0);
+
+                final EditText textBox = new EditText(context);
+                layout.addView(textBox, params);
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setCancelable(true);
+                builder.setTitle("Direct Message: " + userName);
+                builder.setMessage("Type your direct message: ");
+                builder.setView(layout);
+                builder.setPositiveButton(R.string.send, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        if(!textBox.getText().toString().trim().equals("")) {
+                            mClient.sendDirectMessage(textBox.getText().toString(), jid);
+                        }
+                    }
+                });
+                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                break;
+            default:
+                String message = chatText.getText().toString();
+                if(!message.trim().equals(""))
+                {
+                    mClient.sendMultiChatMessage(message);
+                }
+                chatText.setText("");
+                hideSoftKeyboard();
+                break;
         }
     }
+
 
     /**
      * Hides software keyboard from view
@@ -130,6 +182,42 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
 
         adp.add(new ChatBox(nmessage, type, userName));
         adp.notifyDataSetChanged();
+    }
+
+    public void directMessageAlert(String message, String userName)
+    {
+        final String jid = room + "/" + userName;
+        final LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(50, 0, 50, 0);
+
+        final EditText textBox = new EditText(context);
+        layout.addView(textBox, params);
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setCancelable(true);
+        builder.setTitle("Message From: " + userName);
+        builder.setMessage(message);
+        builder.setView(layout);
+        builder.setPositiveButton(R.string.reply, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                mClient.sendDirectMessage(textBox.getText().toString(),jid);
+            }
+        });
+        builder.setNegativeButton(R.string.ignore, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     @Override
@@ -168,5 +256,3 @@ public class ChatRoomActivity extends AppCompatActivity implements View.OnClickL
         return false;
     }
 }
-
-

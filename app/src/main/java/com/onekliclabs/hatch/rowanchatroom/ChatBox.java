@@ -4,7 +4,6 @@ package com.onekliclabs.hatch.rowanchatroom;
 import android.graphics.Bitmap;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 /**

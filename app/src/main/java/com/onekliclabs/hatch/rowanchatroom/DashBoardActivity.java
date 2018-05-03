@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
@@ -78,11 +77,6 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Auth.GoogleSignInApi.signOut(google);
-    }
 
     @Override
     public void onClick(View view)
@@ -97,8 +91,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         {
             case R.id.imgbtn_Shamrock:
 
-                chat = new ChatRoomActivity("Shamrock Talk");
-                Log.i("newUserName", nickName);
+                chat = new ChatRoomActivity("Shamrock Talk", "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
                 xmpp.joinMultiChat(chat, "rowanchat@conference.ec2-54-198-216-41.compute-1.amazonaws.com", nickName);
 
                 // check if joining was successful else throw error
@@ -108,7 +101,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                     Log.e("Error", "Can't join room");
             break;
             case R.id.btn_jHall:
-                chat = new ChatRoomActivity("James Hall");
+                chat = new ChatRoomActivity("James Hall", "jameshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
                 xmpp.joinMultiChat(chat, "jameshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",nickName);
 
                 // check if joining was successful else throw error
@@ -118,7 +111,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                     Log.e("Error", "Can't join room");
             break;
             case R.id.btn_rHall:
-                chat = new ChatRoomActivity("Robinson Hall");
+                chat = new ChatRoomActivity("Robinson Hall", "robinsonhall@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
                 xmpp.joinMultiChat(chat, "robinsonhall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",nickName);
 
                 // check if joining was successful else throw error
@@ -128,7 +121,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                     Log.e("Error", "Can't join room");
                 break;
             case R.id.btn_sHall:
-                chat = new ChatRoomActivity("Science Hall");
+                chat = new ChatRoomActivity("Science Hall", "sciencehall@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
                 xmpp.joinMultiChat(chat,"sciencehall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",nickName);
 
                 // check if joining was successful else throw error
@@ -138,7 +131,7 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
                     Log.e("Error", "Can't join room");
                 break;
             case R.id.btn_bHall:
-                chat = new ChatRoomActivity("Business Hall");
+                chat = new ChatRoomActivity("Business Hall", "businesshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com");
                 xmpp.joinMultiChat(chat, "businesshall@conference.ec2-54-198-216-41.compute-1.amazonaws.com",nickName);
 
                 // check if joining was successful else throw error
@@ -152,11 +145,14 @@ public class DashBoardActivity extends AppCompatActivity implements View.OnClick
         view.setClickable(true);
     }
 
-    @Override
-    public void finish()
+    public void onBackPressed()
     {
-        super.finish();
-        xmpp.disconnectFromServer();
-        Auth.GoogleSignInApi.signOut(google);
+        // open the home screen
+        Intent mainActivity = new Intent(Intent.ACTION_MAIN);
+        mainActivity.addCategory(Intent.CATEGORY_HOME);
+        mainActivity.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(mainActivity);
+        finish();
     }
+
 }
