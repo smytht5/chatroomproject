@@ -1,0 +1,12 @@
+To complete all the project requirements:
+I coded the client that allowed for:
+  connection to the server
+  create an account on the server
+  log into an account on the server
+  join a group chat on the server
+  send and receive messages from a group chat on the server
+  send and receive direct messages from a user on the server
+I developed the login in screen, that allowed for rowan students/faculty to join via google sign in
+I developed that dashboard page that allowed a user to choose a room to enter.
+I designed and coded the main chat room screen that includes, all views and methods associated with the screen.
+Lastly, I wrote about half of every document that needed to be turned in (Project Specification, Design Document, etc.)
